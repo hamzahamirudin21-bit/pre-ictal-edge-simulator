@@ -1,7 +1,7 @@
 import './ui/style.css';
 import { renderDisclaimer } from './disclaimer.js';
 import { generateSignals } from './generator/index.js';
-import { decimateMinMax, valueToY, timeToX, niceTicks, burstSpans } from './ui/plotData.js';
+import { preparePlotSeries, valueToY, timeToX, niceTicks, burstSpans } from './ui/plotData.js';
 import { controlSpecs, tryValidate, debounce, formatNumber } from './ui/format.js';
 
 const disclaimerEl = document.getElementById('disclaimer');
@@ -107,13 +107,12 @@ function drawPlot(canvas, { series, durationSec, yLabel, spans = [] }) {
   const h = cssH - m.t - m.b;
   let lo = Infinity;
   let hi = -Infinity;
-  const dec = series.map((s) => {
-    const d = decimateMinMax(s.data, Math.max(1, Math.floor(w)));
-    for (let i = 0; i < d.columns; i++) {
-      if (d.min[i] < lo) lo = d.min[i];
-      if (d.max[i] > hi) hi = d.max[i];
-    }
-    return d;
+  // Polyline below 3 samples per pixel column, min/max bars at or above it.
+  const prepared = series.map((s) => {
+    const p = preparePlotSeries(s.data, w);
+    if (p.yMin !== null && p.yMin < lo) lo = p.yMin;
+    if (p.yMax !== null && p.yMax > hi) hi = p.yMax;
+    return p;
   });
   if (!Number.isFinite(lo)) { lo = -1; hi = 1; }
   const pad = (hi - lo) * 0.05 || 0.5;
@@ -143,15 +142,32 @@ function drawPlot(canvas, { series, durationSec, yLabel, spans = [] }) {
   ctx.fillText('Time (s)', w / 2, h + 29);
 
   series.forEach((s, si) => {
-    const d = dec[si];
+    const p = prepared[si];
     ctx.strokeStyle = s.color;
     ctx.lineWidth = s.width || 1;
     ctx.beginPath();
-    const xs = d.columns > 1 ? w / (d.columns - 1) : 0;
-    for (let i = 0; i < d.columns; i++) {
-      const x = i * xs;
-      ctx.moveTo(x, valueToY(d.min[i], lo, hi, h));
-      ctx.lineTo(x, valueToY(d.max[i], lo, hi, h) - (d.min[i] === d.max[i] ? 0.5 : 0));
+    if (p.mode === 'line') {
+      // Round joins and caps so sharp turns at peaks do not produce miter spikes.
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      const n = p.x.length;
+      if (n === 1) {
+        const y = valueToY(p.y[0], lo, hi, h);
+        ctx.moveTo(p.x[0] - 0.5, y);
+        ctx.lineTo(p.x[0] + 0.5, y);
+      } else if (n > 1) {
+        ctx.moveTo(p.x[0], valueToY(p.y[0], lo, hi, h));
+        for (let k = 1; k < n; k++) ctx.lineTo(p.x[k], valueToY(p.y[k], lo, hi, h));
+      }
+    } else {
+      // Canvas defaults, set explicitly so a previous series cannot change them.
+      ctx.lineJoin = 'miter';
+      ctx.lineCap = 'butt';
+      for (let i = 0; i < p.x.length; i++) {
+        const x = p.x[i];
+        ctx.moveTo(x, valueToY(p.min[i], lo, hi, h));
+        ctx.lineTo(x, valueToY(p.max[i], lo, hi, h) - (p.min[i] === p.max[i] ? 0.5 : 0));
+      }
     }
     ctx.stroke();
   });
