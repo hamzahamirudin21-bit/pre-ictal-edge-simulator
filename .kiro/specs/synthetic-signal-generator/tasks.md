@@ -6,11 +6,11 @@ Parameter ranges and defaults: see the table in `requirements.md`.
 
 - [x] 1. Add the disclaimer to README.md and create the steering doc (`.kiro/steering/disclaimer-and-safety.md`) _(R8)_
 
-- [ ] 2. Scaffold the project
-  - [ ] 2.1 Create `package.json` (type: module) with pinned versions of vite, vitest, fast-check; scripts: `dev`, `build`, `test` (`vitest --run`)
-  - [ ] 2.2 Add `vite.config.js` with the Vitest config, `index.html` with a static visible disclaimer banner, `src/disclaimer.js`, and a minimal stub `src/main.js` that renders the disclaimer _(R8)_
-  - [ ] 2.3 Add a placeholder test (for example `test/disclaimer.test.js` checking that `DISCLAIMER_TEXT` mentions "synthetic" and "NOT a medical device") so the test runner does not fail with no test files
-  - [ ] 2.4 Verify that `npm run build` and `npm test` pass
+- [x] 2. Scaffold the project
+  - [x] 2.1 Create `package.json` (type: module) with pinned versions of vite, vitest, fast-check; scripts: `dev`, `build`, `test` (`vitest --run`)
+  - [x] 2.2 Add `vite.config.js` with the Vitest config, `index.html` with a static visible disclaimer banner, `src/disclaimer.js`, and a minimal stub `src/main.js` that renders the disclaimer _(R8)_
+  - [x] 2.3 Add a placeholder test (for example `test/disclaimer.test.js` checking that `DISCLAIMER_TEXT` mentions "synthetic" and "NOT a medical device") so the test runner does not fail with no test files
+  - [x] 2.4 Verify that `npm run build` and `npm test` pass
 
 - [ ] 3. Seeded PRNG and params
   - [ ] 3.1 Implement `src/generator/prng.js` (mulberry32, gaussian, `deriveSeed`) _(R1.1, R1.5)_
