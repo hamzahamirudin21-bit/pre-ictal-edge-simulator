@@ -43,6 +43,49 @@
         "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
         "timestamp": 1794284240286
       }
+    ],
+    "5.1 Implement `imu.js` (gravity and orientation, motion, noise, non-overlapping tremor bursts 3-6 Hz, dynamic bound) _(R5)_": [
+      {
+        "executionId": "3142fad5-b196-4fad-8d1c-f2a42523145c",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794284777254
+      },
+      {
+        "executionId": "3142fad5-b196-4fad-8d1c-f2a42523145c",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794285100717
+      }
+    ],
+    "5.2 Implement `spectrum.js` (`bandEnergy`, `tremorBandEnergy`)": [
+      {
+        "executionId": "3142fad5-b196-4fad-8d1c-f2a42523145c",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794284778326
+      },
+      {
+        "executionId": "3142fad5-b196-4fad-8d1c-f2a42523145c",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794285101307
+      }
+    ],
+    "5.3 Unit tests: gravity magnitude near 1 g at rest, no tremor at 0, at least one burst, bursts do not overlap, burst frequencies inside 3-6 Hz, dominant spectral peak inside 3-6 Hz, tremor difference signal scales as `t^2`, bounds": [
+      {
+        "executionId": "3142fad5-b196-4fad-8d1c-f2a42523145c",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794285113348
+      },
+      {
+        "executionId": "3142fad5-b196-4fad-8d1c-f2a42523145c",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794285326949
+      }
+    ],
+    "5. IMU": [
+      {
+        "executionId": "3142fad5-b196-4fad-8d1c-f2a42523145c",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794285327368
+      }
     ]
   }
 }

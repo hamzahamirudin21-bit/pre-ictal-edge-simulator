@@ -26,10 +26,10 @@ This plan builds the synthetic signal generator in small steps: seeded PRNG and 
   - [x] 4.2 Implement `ppg.js` (pulse rendering, baseline wander, clip; `Float64Array` output) _(R3, R7)_
   - [x] 4.3 Unit tests: effective HR and SDNN formulas, clamp at 180 bpm and at the SDNN cap with flags, RR within [300, 2000] ms, sample SDNN within tolerance (R3.7) for 30 s or more, strictly increasing beat times, knob identity at 0, SDNN decreases and LF/HF increases with the knob, bounded PPG _(R9.1)_
 
-- [ ] 5. IMU
-  - [ ] 5.1 Implement `imu.js` (gravity and orientation, motion, noise, non-overlapping tremor bursts 3-6 Hz, dynamic bound) _(R5)_
-  - [ ] 5.2 Implement `spectrum.js` (`bandEnergy`, `tremorBandEnergy`)
-  - [ ] 5.3 Unit tests: gravity magnitude near 1 g at rest, no tremor at 0, at least one burst, bursts do not overlap, burst frequencies inside 3-6 Hz, dominant spectral peak inside 3-6 Hz, tremor difference signal scales as `t^2`, bounds
+- [x] 5. IMU
+  - [x] 5.1 Implement `imu.js` (gravity and orientation, motion, noise, non-overlapping tremor bursts 3-6 Hz, dynamic bound) _(R5)_
+  - [x] 5.2 Implement `spectrum.js` (`bandEnergy`, `tremorBandEnergy`)
+  - [x] 5.3 Unit tests: gravity magnitude near 1 g at rest, no tremor at 0, at least one burst, bursts do not overlap, burst frequencies inside 3-6 Hz, dominant spectral peak inside 3-6 Hz, tremor difference signal scales as `t^2`, bounds
 
 - [ ] 6. Motion artifact
   - [ ] 6.1 Implement `artifact.js` (`lowpassZeroPhase`, `computeArtifact` on fixed z axis, scale 2.0) and integrate into the PPG _(R6)_
