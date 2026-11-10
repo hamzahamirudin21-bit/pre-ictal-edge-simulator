@@ -283,6 +283,44 @@
         "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
         "timestamp": 1794293434530
       }
+    ],
+    "9.1 Write `src/generator/README.md` and JSDoc for `generateSignals` and the parameters: open with the standard disclaimer, document the parameter table, the feasibility clamp (R3.4, R3.6), and that the pre-ictal-like knob is a simulation knob and not a clinical claim _(R3.6, R4.3, R8.1)_": [
+      {
+        "executionId": "3ee6f68e-ab69-4263-87df-95e79b3697c7",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794294101838
+      },
+      {
+        "executionId": "3ee6f68e-ab69-4263-87df-95e79b3697c7",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794297206546
+      }
+    ],
+    "9. Docs": [
+      {
+        "executionId": "3ee6f68e-ab69-4263-87df-95e79b3697c7",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794297206720
+      }
+    ],
+    "10.1 `src/main.js`: parameter controls, canvas plots of PPG and accel labeled \"Synthetic data\", clamp indicator, pre-ictal control labeled as a simulation knob, disclaimer visible _(R4.3, R8)_": [
+      {
+        "executionId": "57e5d8fe-223a-435f-a9dd-1a46134fe24a",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794297439773
+      },
+      {
+        "executionId": "57e5d8fe-223a-435f-a9dd-1a46134fe24a",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794297695347
+      }
+    ],
+    "10.2 Manually check that the disclaimer is visible without interaction and that no copy implies clinical meaning": [
+      {
+        "executionId": "57e5d8fe-223a-435f-a9dd-1a46134fe24a",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794297697594
+      }
     ]
   }
 }

@@ -7,3 +7,40 @@
 > The "pre-ictal-like" pattern is a simulation parameter for teaching, not a clinical finding.
 
 Educational browser simulator of an edge-ML wearable pipeline (synthetic data).
+
+## What this is
+
+An educational, browser-based simulator of an edge-ML wearable pipeline (PPG + IMU sensor fusion). All data is synthetic.
+
+Module 1, the synthetic signal generator, is implemented. It produces synthetic PPG and 3-axis accelerometer signals with a tunable "pre-ictal-like" HRV pattern (a simulation knob) and a motion artifact in the PPG that follows the accelerometer. Details, parameters and formulas are in [src/generator/README.md](src/generator/README.md).
+
+## Requirements
+
+Node.js `^22.12.0 || ^24.0.0 || >=26.0.0` (the `engines` field in `package.json`, which matches the Vitest 5.1.0 requirement; Vite 8.3.7 alone needs `^20.19.0 || >=22.12.0`).
+
+## How to run
+
+```
+npm install
+npm test        # run the unit and property tests once
+npm run dev     # start the Vite dev server
+npm run build   # production build into dist/
+```
+
+## Project layout
+
+```
+index.html            demo page (static disclaimer banner)
+src/disclaimer.js     shared disclaimer text and renderer
+src/main.js           demo wiring (still a stub)
+src/generator/        Module 1: synthetic signal generator (see its README)
+test/                 Vitest unit tests and fast-check property tests
+```
+
+## Limits
+
+- Synthetic data only. No real sensor or patient data is used.
+- This is not a medical device and makes no clinical claims.
+- "Pre-ictal-like" is a simulation knob for teaching. Its constants are illustrative values, not fitted to clinical data.
+- The demo UI is still a stub until Task 10.
+- The spectrum helper (`bandEnergy`) is O(N x bins), so use short windows.

@@ -50,12 +50,12 @@ This plan builds the synthetic signal generator in small steps: seeded PRNG and 
   - [x] 8.8 P8 artifact correlation thresholds
   - [x] 8.9 P9 feasibility (RR within [0.3, 2.0] s, effective HR at most 180) and P10 input immutability
 
-- [ ] 9. Docs
-  - [ ] 9.1 Write `src/generator/README.md` and JSDoc for `generateSignals` and the parameters: open with the standard disclaimer, document the parameter table, the feasibility clamp (R3.4, R3.6), and that the pre-ictal-like knob is a simulation knob and not a clinical claim _(R3.6, R4.3, R8.1)_
+- [x] 9. Docs
+  - [x] 9.1 Write `src/generator/README.md` and JSDoc for `generateSignals` and the parameters: open with the standard disclaimer, document the parameter table, the feasibility clamp (R3.4, R3.6), and that the pre-ictal-like knob is a simulation knob and not a clinical claim _(R3.6, R4.3, R8.1)_
 
 - [ ] 10. Demo page
-  - [ ] 10.1 `src/main.js`: parameter controls, canvas plots of PPG and accel labeled "Synthetic data", clamp indicator, pre-ictal control labeled as a simulation knob, disclaimer visible _(R4.3, R8)_
-  - [ ] 10.2 Manually check that the disclaimer is visible without interaction and that no copy implies clinical meaning
+  - [x] 10.1 `src/main.js`: parameter controls, canvas plots of PPG and accel labeled "Synthetic data", clamp indicator, pre-ictal control labeled as a simulation knob, disclaimer visible _(R4.3, R8)_
+  - [x] 10.2 Manually check that the disclaimer is visible without interaction and that no copy implies clinical meaning
 
 - [ ] 11. Final checkpoint: run `npm test` and `npm run build`; confirm the README, the module docs, and every screen show the disclaimer
 

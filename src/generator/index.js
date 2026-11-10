@@ -14,10 +14,21 @@ import { renderPPG } from './ppg.js';
 import { generateIMU } from './imu.js';
 import { computeArtifact, applyArtifact } from './artifact.js';
 
+/** @typedef {import('./params.js').GeneratorParams} GeneratorParams */
+
 /**
  * Generate a synthetic PPG + accelerometer recording.
  *
- * @param {object} [params] user parameters (see params.js); validated first.
+ * EDUCATIONAL SIMULATION ONLY. All data is synthetic. This is NOT a medical
+ * device and makes no clinical claims. Do not use it for any medical decision.
+ * The output has `synthetic: true`.
+ *
+ * `meta.tremorBursts` is `[]` when `tremorIntensity` is 0 (no tremor is added);
+ * otherwise it is the full seed-determined burst schedule, which never depends
+ * on `tremorIntensity`. Gravity and other internals are not exposed.
+ *
+ * @param {Partial<GeneratorParams>} [params] user parameters (see the
+ *   GeneratorParams typedef in params.js); validated first.
  * @returns {{
  *   synthetic: true, seed: number, fs: number, durationSec: number, n: number,
  *   ppg: Float64Array, ppgClean: Float64Array, artifact: Float64Array,
