@@ -48,12 +48,6 @@ function pearson(a, b) {
   return sab / Math.sqrt(saa * sbb);
 }
 
-function rms(a) {
-  let s = 0;
-  for (const v of a) s += v * v;
-  return Math.sqrt(s / a.length);
-}
-
 function std(a) {
   const n = a.length;
   let m = 0;
@@ -280,8 +274,8 @@ describe('constant z', () => {
     }
   });
 
-  // Here RMS(dynZ) is NOT 0: dynZ is the constant c - gravityZ, and the unit-DC-gain
-  // low-pass preserves it, so the artifact is the constant gain * 2 * (c - gravityZ).
+  // Here dynZ is constant (standard deviation 0) with a non-zero offset c - gravityZ;
+  // the unit-DC-gain low-pass preserves it, so the artifact is the constant gain * 2 * (c - gravityZ).
   it.each(FSS)('z = gravityZ + offset gives a constant artifact at fs %i', (fs) => {
     for (const gz of GZS) {
       for (const offset of [0.3, -0.5]) {
