@@ -116,6 +116,37 @@
         "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
         "timestamp": 1794309570121
       }
+    ],
+    "3.1 Implement `src/dsp/anc.js`": [
+      {
+        "executionId": "af42aa2a-1b38-44b5-8ca8-78a088ed66e9",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794315595055
+      },
+      {
+        "executionId": "af42aa2a-1b38-44b5-8ca8-78a088ed66e9",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794317179156
+      }
+    ],
+    "3.2 Write unit tests in `test/dsp.anc.test.js`": [
+      {
+        "executionId": "af42aa2a-1b38-44b5-8ca8-78a088ed66e9",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794317179547
+      },
+      {
+        "executionId": "af42aa2a-1b38-44b5-8ca8-78a088ed66e9",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794319102108
+      }
+    ],
+    "3. NLMS adaptive noise canceller": [
+      {
+        "executionId": "af42aa2a-1b38-44b5-8ca8-78a088ed66e9",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794319102272
+      }
     ]
   }
 }

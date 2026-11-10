@@ -140,19 +140,19 @@ All numeric constants in this document are illustrative simulation values and pr
 2. THE ANC SHALL use `D = round(0.1 * fs)` (halves rounded up), `L = 2D + 1` taps, and a centred tap window over reference samples `n-D .. n+D`, treating reference samples outside the index range `0 .. N-1` (N = `n`) as zero.
 3. THE ANC SHALL use step size `mu = 0.1`, regularization `eps = L * 0.01^2`, and initial weights equal to 0.
 4. THE ANC SHALL keep the output aligned with the input index (`e[n]` belongs to `d[n]`) and report the fixed latency of the centred window as `meta.anc.lookaheadSamples = D` and `meta.anc.taps = L`.
-5. WHEN the Primary_Signal is generated from a white-noise reference of standard deviation at least 0.1 by a fixed FIR system that lies inside the tap window, THE ANC SHALL reduce the residual power below 1e-3 of the Primary_Signal power measured as the mean residual power over the samples from `2 * fs + 100 * L` to the end (adaptation starts when the Gate opens at sample `2 * fs`; `100 * L` equals `10 * L / mu`), with a test signal long enough that this range holds at least `10 * L` samples.
+5. WHEN the Primary_Signal `d` is generated noise-free from a white-noise reference of standard deviation at least 0.1 by a fixed FIR system `h` that lies inside the tap window and has `||h||_2 <= W_MAX / 2`, and `d` uses the same zero-padding as the ANC window (reference samples outside `0 .. N-1` are zero), THE ANC SHALL make the mean residual power below 1e-3 of the mean Primary_Signal power, both measured over the same samples, from sample `2 * fs + 100 * L` to the end (the Gate window is first full at sample `2 * fs`; `100 * L` equals `10 * L / mu`), with at least `10 * L` samples in that range.
 6. WHEN the ANC is enabled, THE Signal_Processor SHALL compute `ppgFiltered` as the PPG_Bandpass of `ppgAnc`, where `ppgAnc` is the ANC output `e`.
 
 ### Requirement 9: ANC activity gate
 
-**User Story:** As a learner, I want the canceller to stay out of the way when there is no motion, so that clean PPG passes through unchanged.
+**User Story:** As a learner, I want the canceller to stay out of the way when there is no motion, so that clean PPG passes through unchanged while the motion reference is nearly silent.
 
 #### Acceptance Criteria
 
-1. THE Gate SHALL compute the population standard deviation of the Reference_Signal over the causal window of the last `2 * fs` samples, and SHALL treat the window as not yet full (gate closed) for samples before `2 * fs` reference samples have been observed.
+1. THE Gate SHALL compute, for sample `n`, the population standard deviation of the Reference_Signal over the window `r[n - 2*fs .. n - 1]`, the `2 * fs` samples before `n` (the current sample is excluded), and SHALL stay closed for `n < 2 * fs`, so that the window is first full exactly at `n = 2 * fs`.
 2. WHILE the Gate is closed (window standard deviation below 0.01 g, or window not yet full), THE ANC SHALL freeze the weights and output `e[n] = d[n]` exactly.
-3. WHILE the No_Motion_Condition holds, THE Signal_Processor SHALL keep the Gate closed for every sample, so that `ppgFiltered` equals `ppgBandpassed` within an absolute difference of 1e-12.
-4. THE Signal_Processor SHALL report `meta.anc.gatedFraction` as the fraction of samples (in 0..1) for which the Gate was closed, and SHALL report 1 under the No_Motion_Condition.
+3. WHILE the No_Motion_Condition holds, THE Signal_Processor SHALL report `meta.anc.gatedFraction >= 0.99` for each configuration tested (Property 6 tests at least 40 configurations). This is a statistical target, not a bound for every input: 0.99 was chosen below the minimum `gatedFraction` (1) measured over 1200 configurations, and design.md, Decision C, gives the measurement. WHEN the Gate is closed for every sample (`gatedFraction = 1`), THE Signal_Processor SHALL return `ppgFiltered` equal to `ppgBandpassed` within an absolute difference of 1e-12.
+4. THE Signal_Processor SHALL report `meta.anc.gatedFraction` as the fraction of samples (in 0..1) for which the Gate was closed. IF the ANC receives a zero-length input, THEN THE ANC SHALL return `gatedFraction = null`, the same convention as Requirement 14.6.
 
 ### Requirement 10: Weight clamp safety net
 

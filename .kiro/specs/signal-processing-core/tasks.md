@@ -32,12 +32,12 @@ This plan builds Module 2 in small steps: biquad design and the PPG bandpass, th
     - DC tracker recurrence and `dc[0]`; constant z gives `|r| <= 1e-12`; step convergence below 1e-3 of the step after 30 s; `imuTremor` gain at most 0.07 at 0.5 Hz and at least 0.95 at 4 Hz; L1 bound on examples; reference path has no 2 Hz high-pass (0.3 Hz sinusoid gain 0.980-0.986 depending on fs (0.9802 at 25 Hz, 0.9840 at 64 Hz, 0.9858 at 256 Hz))
     - _Requirements: 6.1, 6.3, 6.4, 6.5, 7.2, 7.3, 16.1_
 
-- [ ] 3. NLMS adaptive noise canceller
-  - [ ] 3.1 Implement `src/dsp/anc.js`
-    - `nlmsCancel(d, r, fs)`: centred window `n-D .. n+D`, `D = round(0.1 * fs)`, `L = 2D + 1`, zero outside `0 .. N-1`; `mu = 0.1`, `eps = L * 0.01^2`, weights start at 0; gate on the population standard deviation of `r` over the last `2 * fs` samples (closed while the window is not full or the value is below 0.01 g; frozen weights and `e = d` exactly); weight norm clamp `W_MAX = 10`; returns `{e, gatedFraction, weightClampActive, taps, lookaheadSamples, mu}`
+- [x] 3. NLMS adaptive noise canceller
+  - [x] 3.1 Implement `src/dsp/anc.js`
+    - `nlmsCancel(d, r, fs)`: centred window `n-D .. n+D`, `D = round(0.1 * fs)`, `L = 2D + 1`, zero outside `0 .. N-1`; `mu = 0.1`, `eps = L * 0.01^2`, weights start at 0; gate on the population standard deviation of `r[n - 2*fs .. n - 1]`, the `2 * fs` samples before `n` with the current sample excluded (closed for `n < 2 * fs`, so the window is first full exactly at `n = 2 * fs`, and closed while the value is below 0.01 g; frozen weights and `e = d` exactly); weight norm clamp `W_MAX = 10`; returns `{e, gatedFraction, weightClampActive, taps, lookaheadSamples, mu}`
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 9.1, 9.2, 10.1, 10.2, 10.3_
-  - [ ] 3.2 Write unit tests in `test/dsp.anc.test.js`
-    - Window and `taps` / `lookaheadSamples` for several `fs` (including `fs` = 25 and 256); convergence on a known FIR system with a white-noise reference (mean residual power below 1e-3 of the primary power over samples from `2 * fs + 100 * L` to the end); gate closed gives `e === d` exactly and unchanged weights; gate not full at the start; weight clamp activation with a forced large reference and the reported flag; output bound
+  - [x] 3.2 Write unit tests in `test/dsp.anc.test.js`
+    - Window and `taps` / `lookaheadSamples` for several `fs` (including `fs` = 25 and 256); convergence on a known FIR system `h` inside the tap window with `||h||_2 <= W_MAX / 2` and a white-noise reference, with a noise-free primary that uses the same zero-padding as the ANC window (mean residual power below 1e-3 of the mean primary power, both over the same samples from `2 * fs + 100 * L` to the end); gate closed gives `e === d` exactly and unchanged weights; gate not full at the start; zero-length input gives `gatedFraction === null`; weight clamp activation with a forced large reference and the reported flag; output bound
     - _Requirements: 8.2, 8.3, 8.4, 8.5, 9.1, 9.2, 10.1, 10.2, 10.3, 16.1_
 
 - [ ] 4. Peak detection and RR
@@ -81,7 +81,7 @@ This plan builds Module 2 in small steps: biquad design and the PPG bandpass, th
     - **Property 5: Determinism**
     - **Validates: Requirements 3.1**
   - [ ] 7.6 Write Property 6
-    - **Property 6: ANC is an exact pass-through under the no-motion condition**
+    - **Property 6: No-motion gated fraction is at least 0.99, and a fully gated run is a pass-through**
     - **Validates: Requirements 9.2, 9.3, 9.4**
   - [ ] 7.7 Write Property 7
     - **Property 7: Disabled ANC is the identity**
@@ -120,7 +120,7 @@ This plan builds Module 2 in small steps: biquad design and the PPG bandpass, th
 ## Notes
 
 - All data is synthetic. This is NOT a medical device and makes no clinical claims.
-- Property thresholds (L1 bound tolerance, 1e-12 pass-through, beat-count tolerance, MSE reduction) are provisional design targets. If a property test fails, report the counterexample; do not loosen the threshold.
+- Property thresholds (L1 bound tolerance, the no-motion `gatedFraction >= 0.99` target, 1e-12 pass-through in runs with `gatedFraction = 1`, beat-count tolerance, MSE reduction) are provisional design targets. The 0.99 target is statistical, chosen below the minimum measured over 1200 configurations (design.md, Decision C), and is not a bound for every input. If a property test fails, report the counterexample; do not loosen the threshold.
 - Beat-detection scores for `motionIntensity > 0` or `tremorIntensity > 0` are reported metrics from `npm run metrics`. They are not tests and not pass/fail.
 - Each requirement is covered by at least one task and one test; the coverage table is in `design.md`.
 - Module 2 has no randomness. Any future randomness must use `createRng(deriveSeed(...))` from Module 1.

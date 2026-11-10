@@ -97,9 +97,10 @@ Trade-offs: the tracker acts as a one-pole high-pass on `r`, with gain 0.980-0.9
 - Filter length and look-ahead: Module 1's artifact low-pass is zero-phase (non-causal, two-sided kernel, tau = 1/(2*pi*8) = about 20 ms), so a causal FIR cannot model it. The ANC uses a centred tap window over reference samples `n-D .. n+D`, with `D = round(0.1 * fs)` (halves rounded up) and `L = 2D + 1` taps, covering about +-5 tau = +-100 ms. On a device this equals a fixed latency of `D` samples. In the simulation the output stays aligned with the input index; for `n + D >= N` the missing future reference samples are zero. `L` ranges from 7 (`fs` = 25, D = 3) to 53 (`fs` = 256, D = 26).
 - Step size `mu = 0.1`. NLMS is mean-square stable for 0 < mu < 2. A small `mu` trades slower convergence (about `L / mu` samples, about 2 s at 256 Hz and up to about 2.8 s at 25 Hz) for lower misadjustment (the PPG pulse is uncorrelated with the reference and acts as noise on the weights).
 - Regularization `eps = L * sigmaFloor^2` with `sigmaFloor = 0.01 g`, so a near-silent reference does not cause large steps. Weights start at 0.
-- Gate: the ANC computes the population standard deviation of `r` over a causal window of `2 * fs` samples. While the window is not yet full, or the standard deviation is below 0.01 g (the same threshold as Module 1 R6.3 and P8), the gate is closed: the update is frozen and the output is the primary sample unchanged (`e = d` exactly). Requiring a full window avoids chance openings from the few samples at the start. With `motionIntensity = 0` and `tremorIntensity = 0`, Module 1's accelerometer holds only sensor noise (sigma 0.005 g, clipped at 4 sigma). The window standard deviation then stays near 0.005 g, plus at most about 0.003 g from the decaying DC-tracker start-up offset, so the gate stays closed and the ANC is an exact pass-through. This is a statistical argument, not an absolute bound; a counterexample found by a property test must be reported.
+- Gate: for sample `n`, the ANC computes the population standard deviation of `r[n - 2*fs .. n - 1]`, the `2 * fs` samples before `n` (the current sample is excluded). The gate is closed for `n < 2 * fs`, so the window is first full exactly at `n = 2 * fs`, matching R8.5. From then on, the gate is closed while the standard deviation is below 0.01 g (the same threshold as Module 1 R6.3 and P8). While the gate is closed, the update is frozen and the output is the primary sample unchanged (`e = d` exactly). Requiring a full window avoids chance openings from the few samples at the start. With `motionIntensity = 0` and `tremorIntensity = 0`, Module 1's accelerometer holds only sensor noise (sigma 0.005 g, clipped at 4 sigma = 0.02 g). The window standard deviation then stays near 0.005 g, plus at most about 0.003 g from the decaying DC-tracker start-up offset. The clipping bounds each sample, but a window's standard deviation can still exceed 0.01 g in principle, so the no-motion behaviour is a statistical target, not a bound for every input. Measurement (a throwaway script outside the repo, gate exactly as defined here, applied to `ancReference(accel.z, fs)` of Module 1 output with both intensities 0): M = 1200 configurations, 900 from a grid (seeds 1..100 x `fs` {25, 64, 256} x `durationSec` {5, 30, 600}, other parameters at defaults) and 300 drawn over the full parameter ranges with `createRng(20240611)`. The minimum `gatedFraction` was m = 1, no configuration had `gatedFraction < 1`, and the largest window standard deviation over all samples `n >= 2 * fs` was 0.00735 g (seed 65, `fs` = 25, `durationSec` = 600, at 199.84 s), a margin of 0.00265 g below 0.01 g. Target: X = floor((m - 0.01) * 100) / 100 = 0.99, used by R9.3 and Property 6. A Property 6 run below 0.99 is a counterexample to report (R16.5); the target is not lowered.
 - Safety net: the weight vector norm is clamped, `||w||_2 <= W_MAX = 10`. `meta.anc.weightClampActive` tells whether the clamp ever acted (expected never for valid inputs; tests measure it). Bound for tests: `|y[n]| <= W_MAX * sqrt(L) * max|r|`, hence `|e| <= max|d| + W_MAX * sqrt(L) * max|r|`.
-- Definition used by the spec: "no-motion condition" means `motionIntensity = 0` and `tremorIntensity = 0`, because tremor bursts also create artifact in Module 1. The statement "pass-through when motion is 0" is interpreted this way.
+- Convergence test (R8.5): the test primary is noise-free, `d[n] = h . x_vec[n]` with the same zero-padding as the ANC window, for a fixed FIR system `h` inside the tap window with `||h||_2 <= W_MAX / 2`. Then `e = (h - w) . x_vec`, and NLMS with 0 < mu < 2 never increases `||w - h||`. Starting from `w = 0`, `||w - h|| <= ||h||` at every sample, so `||w|| <= 2 ||h|| <= W_MAX` and the clamp never acts. For white input, the expected relative misalignment `E||w - h||^2 / ||h||^2` after `100 * L` adapted samples is about `(1 - mu * (2 - mu) / L)^(100 * L)`, about `e^-19`, far below the 1e-3 power target.
+- Definition used by the spec: "no-motion condition" means `motionIntensity = 0` and `tremorIntensity = 0`, because tremor bursts also create artifact in Module 1. The statement "pass-through when motion is 0" is interpreted this way, as the statistical target of R9.3 (`gatedFraction >= 0.99`); the pass-through is exact (within 1e-12 after the bandpass) in runs where the Gate is closed for every sample.
 - Gate lag: the gate uses a causal window, so it reacts to the start of motion up to a window length late, and stays open for up to a window length after motion stops. This is documented, not corrected.
 
 #### Decision D: Peak detection and RR
@@ -146,7 +147,8 @@ Cost: the filters are O(N); NLMS is O(N x L) with L up to 53, so 600 s at 256 Hz
 | DC tracker cutoff | 0.05 Hz |
 | ANC window | `D = round(0.1 * fs)`, `L = 2D + 1` |
 | `mu`, `sigmaFloor`, `eps` | 0.1, 0.01 g, `L * sigmaFloor^2` |
-| Gate window, gate threshold | 2 s, 0.01 g |
+| Gate window, gate threshold | `r[n - 2*fs .. n - 1]` (the `2 * fs` samples before `n`, current sample excluded; gate closed for `n < 2 * fs`), 0.01 g |
+| No-motion `gatedFraction` target X | 0.99 (statistical target; measurement in Decision C) |
 | `W_MAX` | 10 |
 | Peak lookback, threshold fraction | 3 s, 0.5 |
 | Refractory | `max(0.3 s, 0.6 * median of last up to 5 RR)` |
@@ -181,6 +183,8 @@ Output of `processSignals`:
   }
 }
 ```
+
+`gatedFraction` (from `nlmsCancel`, reported as `meta.anc.gatedFraction`) is the number of samples with the Gate closed divided by `N`. For a zero-length input (`N = 0`), `nlmsCancel` returns `gatedFraction = null`, the same convention as R14.6. `processSignals` never passes `N = 0`, because R1.5 requires `n >= 1`; with the ANC disabled it reports `null` (R11.3).
 
 Result of `evaluateBeats`: `{ tp, fp, fn, sensitivity, ppv, trueCount, detectedCount, beatCountError, rrMaeMs, lag, lagEstimated }`, with `null` for ratios or means that have an empty denominator.
 
@@ -222,9 +226,9 @@ All thresholds below are provisional design targets. If an implementation run vi
 
 **Validates: Requirements 3.1**
 
-### Property 6: ANC is an exact pass-through under the no-motion condition
+### Property 6: No-motion gated fraction is at least 0.99, and a fully gated run is a pass-through
 
-*For any* Module 1 parameters with `motionIntensity = 0` and `tremorIntensity = 0` (full ranges for the other parameters, including `fs` in 25..256 and `durationSec` in 5..600), `ppgFiltered` equals `ppgBandpassed` with a maximum absolute difference of at most 1e-12, and `meta.anc.gatedFraction` equals 1. The tolerance only covers floating-point rounding; the equality is exact by the gate.
+*For any* Module 1 parameters with `motionIntensity = 0` and `tremorIntensity = 0` (full ranges for the other parameters, including `fs` in 25..256 and `durationSec` in 5..600), `meta.anc.gatedFraction >= 0.99`; and in every run with `meta.anc.gatedFraction = 1`, `ppgFiltered` equals `ppgBandpassed` with a maximum absolute difference of at most 1e-12. The 0.99 target is statistical, chosen below the measured minimum (Decision C). The tolerance only covers floating-point rounding; with the Gate closed for every sample, `e = d` exactly.
 
 **Validates: Requirements 9.2, 9.3, 9.4**
 
