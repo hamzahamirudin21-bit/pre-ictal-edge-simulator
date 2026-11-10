@@ -137,6 +137,152 @@
         "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
         "timestamp": 1794287852575
       }
+    ],
+    "7.1 Independent RNG sub-streams via `deriveSeed`, output shape, `synthetic: true`, `meta` (effective values, `clamped`, `tremorBursts`) _(R1, R2, R8)_": [
+      {
+        "executionId": "fb67e746-0368-4089-8dfe-779f872d91e0",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794291050762
+      },
+      {
+        "executionId": "fb67e746-0368-4089-8dfe-779f872d91e0",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794291169388
+      }
+    ],
+    "7.2 Unit tests in `test/generator.test.js`: output shape, all arrays are `Float64Array`, default `fs` 64, defaults, non-mutation of input, changing `tremorIntensity` leaves `ppgClean` unchanged": [
+      {
+        "executionId": "fb67e746-0368-4089-8dfe-779f872d91e0",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794291170077
+      },
+      {
+        "executionId": "fb67e746-0368-4089-8dfe-779f872d91e0",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794291447705
+      }
+    ],
+    "7. Assemble `generateSignals` in `src/generator/index.js`": [
+      {
+        "executionId": "fb67e746-0368-4089-8dfe-779f872d91e0",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794291448007
+      }
+    ],
+    "8.1 P1 same seed gives same output": [
+      {
+        "executionId": "6144f6f6-6d75-47b1-8f05-d860d1a8ee2e",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794291919551
+      },
+      {
+        "executionId": "6144f6f6-6d75-47b1-8f05-d860d1a8ee2e",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794292084048
+      }
+    ],
+    "8.2 P2 sample count equals duration x rate": [
+      {
+        "executionId": "6144f6f6-6d75-47b1-8f05-d860d1a8ee2e",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794292084843
+      },
+      {
+        "executionId": "6144f6f6-6d75-47b1-8f05-d860d1a8ee2e",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794292146085
+      }
+    ],
+    "8.3 P3 amplitudes bounded, finite, `Float64Array`": [
+      {
+        "executionId": "6144f6f6-6d75-47b1-8f05-d860d1a8ee2e",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794292146712
+      },
+      {
+        "executionId": "6144f6f6-6d75-47b1-8f05-d860d1a8ee2e",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794292327141
+      }
+    ],
+    "8.4 P4 tremor energy rises with the tremor parameter (difference signal, t1, t2 in {0} ∪ [0.05, 1], `t^2` scaling, full signal at 1 above 0)": [
+      {
+        "executionId": "6144f6f6-6d75-47b1-8f05-d860d1a8ee2e",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794292327539
+      },
+      {
+        "executionId": "6144f6f6-6d75-47b1-8f05-d860d1a8ee2e",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794292504676
+      }
+    ],
+    "8.5 P5 artifact zero at gain 0 and `ppg` equals `ppgClean`": [
+      {
+        "executionId": "6144f6f6-6d75-47b1-8f05-d860d1a8ee2e",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794292505456
+      },
+      {
+        "executionId": "6144f6f6-6d75-47b1-8f05-d860d1a8ee2e",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794292622506
+      }
+    ],
+    "8.6 P6 strictly increasing beat times": [
+      {
+        "executionId": "6144f6f6-6d75-47b1-8f05-d860d1a8ee2e",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794292623592
+      },
+      {
+        "executionId": "6144f6f6-6d75-47b1-8f05-d860d1a8ee2e",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794292703632
+      }
+    ],
+    "8.7 P7 pre-ictal knob monotonic (SDNN, HR, LF/HF)": [
+      {
+        "executionId": "6144f6f6-6d75-47b1-8f05-d860d1a8ee2e",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794292704519
+      },
+      {
+        "executionId": "6144f6f6-6d75-47b1-8f05-d860d1a8ee2e",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794292873217
+      }
+    ],
+    "8.8 P8 artifact correlation thresholds": [
+      {
+        "executionId": "6144f6f6-6d75-47b1-8f05-d860d1a8ee2e",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794292873921
+      },
+      {
+        "executionId": "6144f6f6-6d75-47b1-8f05-d860d1a8ee2e",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794293034840
+      }
+    ],
+    "8.9 P9 feasibility (RR within [0.3, 2.0] s, effective HR at most 180) and P10 input immutability": [
+      {
+        "executionId": "6144f6f6-6d75-47b1-8f05-d860d1a8ee2e",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794293035211
+      },
+      {
+        "executionId": "6144f6f6-6d75-47b1-8f05-d860d1a8ee2e",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794293434160
+      }
+    ],
+    "8. Property-based tests (`test/generator.property.test.js`), arbitraries drawn from the requirements table _(R9)_": [
+      {
+        "executionId": "6144f6f6-6d75-47b1-8f05-d860d1a8ee2e",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794293434530
+      }
     ]
   }
 }

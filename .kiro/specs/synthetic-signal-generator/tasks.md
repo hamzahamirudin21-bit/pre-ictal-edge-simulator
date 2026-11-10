@@ -35,20 +35,20 @@ This plan builds the synthetic signal generator in small steps: seeded PRNG and 
   - [x] 6.1 Implement `artifact.js` (`lowpassZeroPhase`, `computeArtifact` on fixed z axis, scale 2.0) and integrate into the PPG _(R6)_
   - [x] 6.2 Unit tests: low-pass has unit DC gain and non-negative kernel, gain 0 gives zeros and `ppg` equals `ppgClean`, correlation thresholds (0.999 and 0.9), bounds
 
-- [ ] 7. Assemble `generateSignals` in `src/generator/index.js`
-  - [ ] 7.1 Independent RNG sub-streams via `deriveSeed`, output shape, `synthetic: true`, `meta` (effective values, `clamped`, `tremorBursts`) _(R1, R2, R8)_
-  - [ ] 7.2 Unit tests in `test/generator.test.js`: output shape, all arrays are `Float64Array`, default `fs` 64, defaults, non-mutation of input, changing `tremorIntensity` leaves `ppgClean` unchanged
+- [x] 7. Assemble `generateSignals` in `src/generator/index.js`
+  - [x] 7.1 Independent RNG sub-streams via `deriveSeed`, output shape, `synthetic: true`, `meta` (effective values, `clamped`, `tremorBursts`) _(R1, R2, R8)_
+  - [x] 7.2 Unit tests in `test/generator.test.js`: output shape, all arrays are `Float64Array`, default `fs` 64, defaults, non-mutation of input, changing `tremorIntensity` leaves `ppgClean` unchanged
 
-- [ ] 8. Property-based tests (`test/generator.property.test.js`), arbitraries drawn from the requirements table _(R9)_
-  - [ ] 8.1 P1 same seed gives same output
-  - [ ] 8.2 P2 sample count equals duration x rate
-  - [ ] 8.3 P3 amplitudes bounded, finite, `Float64Array`
-  - [ ] 8.4 P4 tremor energy rises with the tremor parameter (difference signal, t1, t2 in {0} ∪ [0.05, 1], `t^2` scaling, full signal at 1 above 0)
-  - [ ] 8.5 P5 artifact zero at gain 0 and `ppg` equals `ppgClean`
-  - [ ] 8.6 P6 strictly increasing beat times
-  - [ ] 8.7 P7 pre-ictal knob monotonic (SDNN, HR, LF/HF)
-  - [ ] 8.8 P8 artifact correlation thresholds
-  - [ ] 8.9 P9 feasibility (RR within [0.3, 2.0] s, effective HR at most 180) and P10 input immutability
+- [x] 8. Property-based tests (`test/generator.property.test.js`), arbitraries drawn from the requirements table _(R9)_
+  - [x] 8.1 P1 same seed gives same output
+  - [x] 8.2 P2 sample count equals duration x rate
+  - [x] 8.3 P3 amplitudes bounded, finite, `Float64Array`
+  - [x] 8.4 P4 tremor energy rises with the tremor parameter (difference signal, t1, t2 in {0} ∪ [0.05, 1], `t^2` scaling, full signal at 1 above 0)
+  - [x] 8.5 P5 artifact zero at gain 0 and `ppg` equals `ppgClean`
+  - [x] 8.6 P6 strictly increasing beat times
+  - [x] 8.7 P7 pre-ictal knob monotonic (SDNN, HR, LF/HF)
+  - [x] 8.8 P8 artifact correlation thresholds
+  - [x] 8.9 P9 feasibility (RR within [0.3, 2.0] s, effective HR at most 180) and P10 input immutability
 
 - [ ] 9. Docs
   - [ ] 9.1 Write `src/generator/README.md` and JSDoc for `generateSignals` and the parameters: open with the standard disclaimer, document the parameter table, the feasibility clamp (R3.4, R3.6), and that the pre-ictal-like knob is a simulation knob and not a clinical claim _(R3.6, R4.3, R8.1)_

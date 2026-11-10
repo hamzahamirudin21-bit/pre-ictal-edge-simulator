@@ -73,15 +73,16 @@ The minimum `fs` of 25 Hz keeps the 3-6 Hz tremor band safely below Nyquist. The
 4. **Tremor energy.** Define tremor band energy as the summed spectral energy over 3-6 Hz of the detrended signal across the three axes. For a fixed seed and other parameters:
    - the tremor-attributable energy, measured on `accel(t) - accel(0)` (the same output with `tremorIntensity` set to 0 subtracted), SHALL be strictly increasing in `tremorIntensity` and scale as its square (within 1e-6 relative error);
    - the full-signal band energy with tremor at 1 SHALL exceed the band energy with tremor at 0.
-5. `meta` SHALL report `tremorBursts` (list of onset, duration, frequency).
+5. `meta` SHALL report `tremorBursts` (list of onset, duration, frequency). WHEN `tremorIntensity = 0` THEN `meta.tremorBursts` SHALL be `[]`, because no tremor is added; otherwise it SHALL be the full seed-determined burst schedule. The schedule itself (onsets, durations, frequencies, per-axis phase and gain) SHALL NOT depend on `tremorIntensity`.
 6. The dynamic (non-gravity) part of each axis SHALL be bounded by 0.75 g by construction; clamping is a safety net only.
 
 ### R6: Motion artifact in PPG
 1. The artifact SHALL be defined as `artifact = artifactGain * 2.0 * lowpass(dynZ)`, where `dynZ = accel.z - g_z` is the accel z-axis (a **fixed axis**, device z) minus the gravity component on z given by the orientation (gravity subtraction, not mean removal), and `lowpass` is a zero-phase single-pole low-pass at 8 Hz with non-negative kernel and unit DC gain. The artifact is a signed projection, not a magnitude.
 2. `ppg = clamp(ppgClean + artifact, -3, 3)`. With `artifactGain = 0`, `artifact` SHALL be all zeros and `ppg` SHALL equal `ppgClean` exactly.
-3. **Correlation thresholds.** When `artifactGain >= 0.01` and the RMS of `dynZ` is at least 0.01 g:
+3. **Correlation thresholds.** When `artifactGain >= 0.01` and the standard deviation of `dynZ` is at least 0.01 g:
    - Pearson correlation between `artifact` and `lowpass(dynZ)` SHALL be at least 0.999;
    - Pearson correlation between `artifact` and raw `accel.z` SHALL be at least 0.9 when `motionIntensity >= 0.3`.
+   The precondition uses the standard deviation, not the RMS: since `dynZ` subtracts gravity rather than the mean, a constant offset can give a large RMS while the correlation is undefined.
 4. `ppgClean`, `artifact`, and `ppg` SHALL all be exposed.
 
 ### R7: Bounded amplitudes

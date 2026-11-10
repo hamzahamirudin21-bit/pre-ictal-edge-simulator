@@ -42,11 +42,11 @@ generateSignals(params?) => {
   meta: {
     effectiveHrBpm, effectiveSdnnMs, lfhf,
     clamped: { hr, sdnn },
-    tremorBursts: [{ onsetSec, durationSec, freqHz }]
+    tremorBursts: [{ onsetSec, durationSec, freqHz }]   // [] when tremorIntensity = 0
   }
 }
 ```
-Pure: returns new arrays, never mutates inputs; `params.js` freezes resolved params. All arrays are `Float64Array`, including `beatTimes`.
+Pure: returns new arrays, never mutates inputs; `params.js` freezes resolved params. All arrays are `Float64Array`, including `beatTimes`. `meta.tremorBursts` is `[]` when `tremorIntensity = 0` (no tremor is added); otherwise it lists the bursts from `imu.js`. The schedule is seed-determined and never depends on the intensity. The output does not expose gravity or other internals.
 
 ## Components
 
@@ -97,11 +97,11 @@ Parameter arbitraries draw from the table in `requirements.md`. Exception (R9.4)
 1. **P1 Determinism:** equal params and seed give deeply equal output (`Float64Array` equality).
 2. **P2 Length:** `ppg`, `ppgClean`, `artifact`, `accel.x/y/z` all have length `round(duration * fs)`.
 3. **P3 Bounds:** `ppgClean` in [-1.5, 1.5], `ppg` in [-3, 3], `artifact` in [-1.5, 1.5], accel in [-4, 4], all finite, all arrays are `Float64Array`.
-4. **P4 Tremor energy:** for fixed seed and other params, let `D(t) = accel(t) - accel(0)` and `E = tremorBandEnergy`. For `t1 < t2` with `t1, t2 ∈ {0} ∪ [0.05, 1]`: `E(D(t2)) > E(D(t1))`, and for every such t: `|E(D(t)) − t^2 · E(D(1))| <= 1e-6 · E(D(1))`. Also `E(accel(1)) > E(accel(0))`. Arbitraries for P4 are restricted as stated above (R9.4 exception).
+4. **P4 Tremor energy:** for fixed seed and other params, let `D(t) = accel(t) - accel(0)` and `E = tremorBandEnergy`. For `t1, t2 ∈ {0} ∪ [0.05, 1]` with `t2 - t1 >= 0.05`: `E(D(t2)) > E(D(t1))`, and for every such t: `|E(D(t)) − t^2 · E(D(1))| <= 1e-6 · E(D(1))`. Also `E(accel(1)) > E(accel(0))`. Arbitraries for P4 are restricted as stated above (R9.4 exception).
 5. **P5 Artifact at gain 0:** `artifact` all zeros and `ppg` equals `ppgClean`.
 6. **P6 Beat times:** strictly increasing.
 7. **P7 Pre-ictal monotonic:** for `k1 <= k2` (`preIctalLikeness`), `meta.effectiveSdnnMs` (after the R3.4 cap) is non-increasing, and `meta.effectiveHrBpm` and `meta.lfhf` are non-decreasing; clamp flags are consistent with R3.4.
-8. **P8 Artifact correlation:** when `artifactGain >= 0.01` and RMS(dynZ) >= 0.01 g, Pearson(`artifact`, `lowpass(dynZ)`) >= 0.999; with `motionIntensity >= 0.3`, Pearson(`artifact`, `accel.z`) >= 0.9.
+8. **P8 Artifact correlation:** when `artifactGain >= 0.01` and std(dynZ) >= 0.01 g (standard deviation, offset-invariant), Pearson(`artifact`, `lowpass(dynZ)`) >= 0.999; with `motionIntensity >= 0.3`, Pearson(`artifact`, `accel.z`) >= 0.9.
 9. **P9 Feasibility:** RR intervals (differences of `beatTimes`) lie in [0.3, 2.0] s for all valid inputs, and `effectiveHrBpm <= 180`.
 10. **P10 Input immutability:** the params object is not mutated.
 
