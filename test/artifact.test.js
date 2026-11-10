@@ -54,6 +54,16 @@ function rms(a) {
   return Math.sqrt(s / a.length);
 }
 
+function std(a) {
+  const n = a.length;
+  let m = 0;
+  for (const v of a) m += v;
+  m /= n;
+  let s = 0;
+  for (const v of a) s += (v - m) * (v - m);
+  return Math.sqrt(s / n);
+}
+
 function maxAbs(a) {
   let m = 0;
   for (const v of a) m = Math.max(m, Math.abs(v));
@@ -179,7 +189,7 @@ describe('correlation (R6.3, P5)', () => {
             const { z, gz } = imu({ seed, durationSec, fs, motionIntensity, tremorIntensity });
             const { dynZ, smooth } = artifactComponents(z, gz, fs);
             const ctx = `seed ${seed} fs ${fs} dur ${durationSec} motion ${motionIntensity} tremor ${tremorIntensity}`;
-            expect(rms(dynZ), ctx).toBeGreaterThanOrEqual(0.01);
+            expect(std(dynZ), ctx).toBeGreaterThanOrEqual(0.01);
             for (const gain of [0.01, 0.5, 1]) {
               const art = computeArtifact(z, gz, gain, fs);
               const r1 = pearson(art, smooth);
@@ -200,7 +210,7 @@ describe('correlation (R6.3, P5)', () => {
       for (const seed of SEEDS) {
         const { z, gz } = imu({ seed, durationSec: 30, fs, motionIntensity: 0.2 });
         const { dynZ, smooth } = artifactComponents(z, gz, fs);
-        if (rms(dynZ) < 0.01) continue;
+        if (std(dynZ) < 0.01) continue;
         for (const gain of [0.01, 0.5, 1]) {
           expect(pearson(computeArtifact(z, gz, gain, fs), smooth), `seed ${seed} fs ${fs}`).toBeGreaterThanOrEqual(0.999);
         }

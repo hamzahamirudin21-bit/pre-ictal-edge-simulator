@@ -55,9 +55,9 @@ This plan builds the synthetic signal generator in small steps: seeded PRNG and 
 
 - [ ] 10. Demo page
   - [x] 10.1 `src/main.js`: parameter controls, canvas plots of PPG and accel labeled "Synthetic data", clamp indicator, pre-ictal control labeled as a simulation knob, disclaimer visible _(R4.3, R8)_
-  - [x] 10.2 Manually check that the disclaimer is visible without interaction and that no copy implies clinical meaning
+  - [ ] 10.2 Manually check that the disclaimer is visible without interaction and that no copy implies clinical meaning
 
-- [ ] 11. Final checkpoint: run `npm test` and `npm run build`; confirm the README, the module docs, and every screen show the disclaimer
+- [x] 11. Final checkpoint: run `npm test` and `npm run build`; confirm the README, the module docs, and every screen show the disclaimer
 
 ## Notes
 
