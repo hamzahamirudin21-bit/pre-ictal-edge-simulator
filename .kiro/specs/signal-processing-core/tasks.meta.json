@@ -43,6 +43,79 @@
         "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
         "timestamp": 1794308058920
       }
+    ],
+    "2.1 Implement `src/dsp/dcTracker.js`": [
+      {
+        "executionId": "018c8d7c-27cd-49d2-aafb-f01a145d9bfb",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794308643923
+      },
+      {
+        "executionId": "018c8d7c-27cd-49d2-aafb-f01a145d9bfb",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794308903898
+      }
+    ],
+    "2.2 Implement `src/dsp/imuConditioning.js`": [
+      {
+        "executionId": "018c8d7c-27cd-49d2-aafb-f01a145d9bfb",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794308904219
+      },
+      {
+        "executionId": "018c8d7c-27cd-49d2-aafb-f01a145d9bfb",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794309091914
+      }
+    ],
+    "2.3 Write unit tests in `test/dsp.imu.test.js`": [
+      {
+        "executionId": "018c8d7c-27cd-49d2-aafb-f01a145d9bfb",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794309092360
+      },
+      {
+        "executionId": "018c8d7c-27cd-49d2-aafb-f01a145d9bfb",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794309569828
+      },
+      {
+        "executionId": "fbc59547-ebcd-420e-86c8-05e88ba75205",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794309836495
+      },
+      {
+        "executionId": "fbc59547-ebcd-420e-86c8-05e88ba75205",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794310139688
+      },
+      {
+        "executionId": "fbc59547-ebcd-420e-86c8-05e88ba75205",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794310152527
+      },
+      {
+        "executionId": "fbc59547-ebcd-420e-86c8-05e88ba75205",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794310261457
+      },
+      {
+        "executionId": "3bf6ff08-31f2-4d5f-81db-212f8d76e71c",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794310420041
+      },
+      {
+        "executionId": "3bf6ff08-31f2-4d5f-81db-212f8d76e71c",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794310746340
+      }
+    ],
+    "2. DC tracker and IMU conditioning": [
+      {
+        "executionId": "018c8d7c-27cd-49d2-aafb-f01a145d9bfb",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794309570121
+      }
     ]
   }
 }

@@ -21,15 +21,15 @@ This plan builds Module 2 in small steps: biquad design and the PPG bandpass, th
     - Coefficients against closed-form values for several `fs`; DC gain 0 (high-pass) and 1 (low-pass); -3 dB at `fc`; pole radius below 1 for every integer `fs` from 25 to 256; steady-state initialization; cascade order and 4 poles / 4 zeros; group delay reported; L1 bound on example inputs; invalid cutoff errors
     - _Requirements: 4.1, 4.2, 4.4, 4.5, 4.6, 5.1, 5.2, 5.3, 5.4, 16.1_
 
-- [ ] 2. DC tracker and IMU conditioning
-  - [ ] 2.1 Implement `src/dsp/dcTracker.js`
+- [x] 2. DC tracker and IMU conditioning
+  - [x] 2.1 Implement `src/dsp/dcTracker.js`
     - `trackDc(z, fs)` with `beta = 1 - exp(-2 * pi * 0.05 / fs)` and `dc[0] = z[0]`; `ancReference(z, fs)` returns `r = z - dc` with no 2 Hz high-pass
     - _Requirements: 6.1, 6.2, 6.5_
-  - [ ] 2.2 Implement `src/dsp/imuConditioning.js`
+  - [x] 2.2 Implement `src/dsp/imuConditioning.js`
     - `tremorHighpass(axis, fs)`: 2 Hz 2nd-order Butterworth high-pass with steady-state initialization; `conditionImu(accel, fs)` returns `{ancReference, imuTremor: {x, y, z}}`, feeding the tremor path from the raw axes and keeping it independent of the ANC; no feature extraction
     - _Requirements: 6.2, 6.5, 7.1, 7.4, 7.5_
-  - [ ] 2.3 Write unit tests in `test/dsp.imu.test.js`
-    - DC tracker recurrence and `dc[0]`; constant z gives `|r| <= 1e-12`; step convergence below 1e-3 of the step after 30 s; `imuTremor` gain at most 0.07 at 0.5 Hz and at least 0.95 at 4 Hz; L1 bound on examples; reference path has no 2 Hz high-pass (0.3 Hz sinusoid gain about 0.986)
+  - [x] 2.3 Write unit tests in `test/dsp.imu.test.js`
+    - DC tracker recurrence and `dc[0]`; constant z gives `|r| <= 1e-12`; step convergence below 1e-3 of the step after 30 s; `imuTremor` gain at most 0.07 at 0.5 Hz and at least 0.95 at 4 Hz; L1 bound on examples; reference path has no 2 Hz high-pass (0.3 Hz sinusoid gain 0.980-0.986 depending on fs (0.9802 at 25 Hz, 0.9840 at 64 Hz, 0.9858 at 256 Hz))
     - _Requirements: 6.1, 6.3, 6.4, 6.5, 7.2, 7.3, 16.1_
 
 - [ ] 3. NLMS adaptive noise canceller

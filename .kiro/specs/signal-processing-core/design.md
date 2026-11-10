@@ -88,7 +88,7 @@ dc[n] = dc[n-1] + beta * (z[n] - dc[n-1]),   beta = 1 - exp(-2*pi*fDc/fs),   fDc
 r[n]  = z[n] - dc[n]
 ```
 
-Trade-offs: the tracker acts as a one-pole high-pass on `r`, with gain about 0.986 and phase lead about 9.5 degrees at 0.3 Hz (the ANC filter can absorb this). The start-up offset decays with a time constant of about 3.2 s and mostly lies below the 0.5 Hz bandpass edge. The reference axis is device z, matching Module 1's artifact model. This is a teaching simplification; a multi-axis reference is a possible extension.
+Trade-offs: the tracker acts as a one-pole high-pass on `r`, with gain 0.980-0.986 depending on fs (0.9802 at 25 Hz, 0.9840 at 64 Hz, 0.9858 at 256 Hz) and phase lead about 9.5 degrees at 0.3 Hz (the ANC filter can absorb this). The start-up offset decays with a time constant of about 3.2 s and mostly lies below the 0.5 Hz bandpass edge. The reference axis is device z, matching Module 1's artifact model. This is a teaching simplification; a multi-axis reference is a possible extension.
 
 #### Decision C: Adaptive noise cancellation (NLMS)
 
