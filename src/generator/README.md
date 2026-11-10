@@ -90,6 +90,8 @@ The cap keeps RR intervals inside [300, 2000] ms, so the RR clamp inside `genera
 
 `preIctalLikeness` is a simulation knob for teaching. It is not a clinical claim. The constants below are illustrative simulation values. They are not fitted to clinical data, and no clinical source is claimed.
 
+In the demo UI this control is labeled "HRV shift (illustrative, not clinical)". The parameter name `preIctalLikeness` is unchanged. See "Scientific status" in the root README for references.
+
 At `k = 1`, relative to `k = 0`:
 
 - mean heart rate is raised by 10% (`HR_SHIFT_FRACTION = 0.1`), before the 180 bpm clamp;

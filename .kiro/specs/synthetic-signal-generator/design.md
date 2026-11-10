@@ -111,4 +111,4 @@ Unit tests also check the measured SDNN (population SD, divide by N, of `rrMs`) 
 `validateParams` throws `TypeError` for non-numeric and `RangeError` for out-of-range or non-finite inputs (including non-integer `seed` and `fs`), with messages naming the field and valid range.
 
 ## Disclaimer
-`src/disclaimer.js` exports `DISCLAIMER_TEXT` and `renderDisclaimer(el)`. `index.html` includes a static banner (visible without JS) and `main.js` also renders it. Plots are captioned "Synthetic data". The pre-ictal-like control is labeled "Pre-ictal-like (simulation knob, not clinical)". `src/generator/README.md` and the JSDoc open with the disclaimer and document the feasibility clamp.
+`src/disclaimer.js` exports `DISCLAIMER_TEXT` and `renderDisclaimer(el)`. `index.html` includes a static banner (visible without JS) and `main.js` also renders it. Plots are captioned "Synthetic data". The `preIctalLikeness` control is labeled "HRV shift (illustrative, not clinical)" (R4.3); the internal parameter name is unchanged. `src/generator/README.md` and the JSDoc open with the disclaimer and document the feasibility clamp.

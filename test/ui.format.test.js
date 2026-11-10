@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { controlSpecs, tryValidate, debounce, formatNumber } from '../src/ui/format.js';
+import { controlSpecs, tryValidate, debounce, formatNumber, HRV_SHIFT_LABEL } from '../src/ui/format.js';
 import { DEFAULTS, RANGES, validateParams } from '../src/generator/params.js';
 import { SEED_MIN, SEED_MAX } from '../src/generator/prng.js';
 
@@ -37,8 +37,9 @@ describe('controlSpecs', () => {
       expect(by[k].step).toBe(1);
     }
   });
-  it('uses the exact pre-ictal label', () => {
-    expect(by.preIctalLikeness.label).toBe('Pre-ictal-like (simulation knob, not clinical)');
+  it('uses the exact HRV shift label', () => {
+    expect(by.preIctalLikeness.label).toBe('HRV shift (illustrative, not clinical)');
+    expect(by.preIctalLikeness.label).toBe(HRV_SHIFT_LABEL);
     expect(by.preIctalLikeness.note).toMatch(/synthetic/);
   });
 });

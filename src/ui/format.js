@@ -10,8 +10,8 @@ export function formatNumber(v, digits = 2) {
   return v.toFixed(digits);
 }
 
-export const PRE_ICTAL_LABEL = 'Pre-ictal-like (simulation knob, not clinical)';
-export const PRE_ICTAL_NOTE = 'Only shifts the simulated HRV and heart rate of this synthetic signal.';
+export const HRV_SHIFT_LABEL = 'HRV shift (illustrative, not clinical)';
+export const HRV_SHIFT_NOTE = 'Only shifts the simulated HRV and heart rate of this synthetic signal.';
 
 /**
  * @returns {{key: string, path: string[], label: string, unit: string, min: number,
@@ -30,8 +30,8 @@ export function controlSpecs() {
     mk('fs', ['fs'], 'Sampling rate', 'Hz', ...r.fs, 1, DEFAULTS.fs, true),
     mk('heartRateBpm', ['heartRateBpm'], 'Base heart rate', 'bpm', ...r.heartRateBpm, 1, DEFAULTS.heartRateBpm),
     mk('hrvSdnnMs', ['hrvSdnnMs'], 'Base SDNN', 'ms', ...r.hrvSdnnMs, 1, DEFAULTS.hrvSdnnMs),
-    mk('preIctalLikeness', ['preIctalLikeness'], PRE_ICTAL_LABEL, '', ...r.preIctalLikeness, 0.01,
-      DEFAULTS.preIctalLikeness, false, PRE_ICTAL_NOTE),
+    mk('preIctalLikeness', ['preIctalLikeness'], HRV_SHIFT_LABEL, '', ...r.preIctalLikeness, 0.01,
+      DEFAULTS.preIctalLikeness, false, HRV_SHIFT_NOTE),
     mk('motionIntensity', ['motionIntensity'], 'Motion intensity', '', ...r.motionIntensity, 0.01, DEFAULTS.motionIntensity),
     mk('tremorIntensity', ['tremorIntensity'], 'Tremor intensity', '', ...r.tremorIntensity, 0.01, DEFAULTS.tremorIntensity),
     mk('orientation.pitchDeg', ['orientation', 'pitchDeg'], 'Pitch', 'deg', ...r.pitchDeg, 1, DEFAULTS.orientation.pitchDeg),

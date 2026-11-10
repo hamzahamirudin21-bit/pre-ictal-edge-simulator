@@ -63,7 +63,7 @@ The minimum `fs` of 25 Hz keeps the 3-6 Hz tremor band safely below Nyquist. The
 ### R4: Pre-ictal-like HRV knob
 1. `preIctalLikeness` in [0, 1] SHALL shift the HRV profile toward a pre-ictal-like pattern: reduced overall HRV (`x(1 - 0.5k)`), a higher LF/HF ratio (`1 + 3k`), and a small increase in mean heart rate (`x(1 + 0.1k)`, before the R3.4 clamp).
 2. At 0 the output SHALL equal that of the unshifted configuration. With respect to `preIctalLikeness`, `meta.effectiveSdnnMs` (the value after the R3.4 cap) SHALL be non-increasing, and `meta.effectiveHrBpm` and `meta.lfhf` SHALL be non-decreasing.
-3. Docs, parameter descriptions, and UI labels SHALL state that this is a simulation knob and not a clinical claim.
+3. Docs, parameter descriptions, and UI labels SHALL state that this is a simulation knob and not a clinical claim. The user-facing label of this control SHALL be exactly "HRV shift (illustrative, not clinical)"; the internal parameter name `preIctalLikeness` is unchanged.
 4. Constants SHALL be named and documented as illustrative simulation values.
 
 ### R5: IMU (3-axis accelerometer)
@@ -93,7 +93,7 @@ The minimum `fs` of 25 Hz keeps the 3-6 Hz tremor band safely below Nyquist. The
 1. The module docs (`src/generator/README.md` and JSDoc on the public API) and the demo page SHALL show the standard disclaimer from the steering doc.
 2. A shared exported disclaimer constant SHALL exist and be rendered on the Vite demo page visibly without interaction; the static HTML SHALL also contain it.
 3. Output SHALL include `synthetic: true`.
-4. The demo page SHALL label the pre-ictal-like control as a simulation knob and plots as "Synthetic data".
+4. The demo page SHALL label the `preIctalLikeness` control "HRV shift (illustrative, not clinical)" (R4.3) and plots as "Synthetic data".
 
 ### R9: Testing
 1. Unit tests SHALL cover the PRNG, `deriveSeed`, parameter validation (including seed), each signal component, the feasibility clamp, and defaults.

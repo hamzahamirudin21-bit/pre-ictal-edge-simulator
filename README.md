@@ -12,7 +12,7 @@ Educational browser simulator of an edge-ML wearable pipeline (synthetic data).
 
 An educational, browser-based simulator of an edge-ML wearable pipeline (PPG + IMU sensor fusion). All data is synthetic.
 
-Module 1, the synthetic signal generator, is implemented. It produces synthetic PPG and 3-axis accelerometer signals with a tunable "pre-ictal-like" HRV pattern (a simulation knob) and a motion artifact in the PPG that follows the accelerometer. Details, parameters and formulas are in [src/generator/README.md](src/generator/README.md).
+Module 1, the synthetic signal generator, is implemented. It produces synthetic PPG and 3-axis accelerometer signals with a tunable "pre-ictal-like" HRV pattern (a simulation knob) and a motion artifact in the PPG that follows the accelerometer. In the demo UI this control is labeled "HRV shift (illustrative, not clinical)"; the parameter is `preIctalLikeness`. Details, parameters and formulas are in [src/generator/README.md](src/generator/README.md).
 
 ## Requirements
 
@@ -41,6 +41,17 @@ test/                 Vitest unit tests and fast-check property tests
 
 - Synthetic data only. No real sensor or patient data is used.
 - This is not a medical device and makes no clinical claims.
-- "Pre-ictal-like" is a simulation knob for teaching. Its constants are illustrative values, not fitted to clinical data.
-- The demo UI is still a stub until Task 10.
+- The "HRV shift (illustrative, not clinical)" control (`preIctalLikeness`) is a simulation knob for teaching. Its constants are illustrative values, not fitted to clinical data.
+- The demo UI has not been checked in a browser by an automated test; rendering and layout need a manual check.
 - The spectrum helper (`bandEnergy`) is O(N x bins), so use short windows.
+
+## Scientific status
+
+The direction and size of the HRV shift in this simulator are illustrative choices, not fitted to data. Published work reports heart rate variability changes around seizures (peri-ictal), but these dynamics vary between patients and between seizures, and HRV-based seizure prediction is not validated for clinical use. This project makes no clinical claims.
+
+- Mason F, et al. Heart Rate Variability as a Tool for Seizure Prediction: A Scoping Review. J Clin Med. 2024;13(3):747. https://doi.org/10.3390/jcm13030747
+- Kalousios S, Müller J, Yang H, et al. ECG-based epileptic seizure prediction: Challenges of current data-driven models. Epilepsia Open. 2025;10:143-154. https://doi.org/10.1002/epi4.13073
+
+Mason et al. is a scoping review of 72 studies reporting autonomic cardiac changes around seizure onset that HRV can capture, with clearer effects in some patient groups.
+
+Kalousios et al. report that in pseudo-prospective patient-specific prediction (39 patients, 252 seizures) performance was near chance on average (ROC-AUC about 0.57) and that preictal HRV dynamics varied between seizures and patients, so clinical application is not warranted.

@@ -29,6 +29,19 @@ describe('UI copy rules', () => {
     expect(uiFiles.length).toBeGreaterThan(0);
   });
 
+  it('does not use the old pre-ictal-like label', () => {
+    const old = 'pre-ictal-like (simulation knob, not clinical)';
+    for (const { name, text } of targets) {
+      expect(text.toLowerCase().includes(old), `${name} contains the old label`).toBe(false);
+    }
+  });
+
+  it('shows the HRV shift label somewhere under src/ui', () => {
+    const label = 'HRV shift (illustrative, not clinical)';
+    const found = uiFiles.some((f) => readFileSync(f, 'utf8').includes(label));
+    expect(found).toBe(true);
+  });
+
   it('contains no clinical-claim phrases', () => {
     for (const { name, text } of targets) {
       const lower = text.toLowerCase();
