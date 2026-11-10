@@ -18,7 +18,7 @@ src/
     hrv.js                 resolveHrv (shift + clamp), generateRRSeries
     ppg.js                 renderPPG(beatTimes, n, fs, rng)
     imu.js                 generateIMU
-    artifact.js            lowpassZeroPhase, computeArtifact
+    artifact.js            lowpassZeroPhase, computeArtifact (takes the gravity z component g_z as an input)
     spectrum.js            bandEnergy(signal, fs, lo, hi) (Goertzel/DFT), used by tests and demo
     index.js               generateSignals(params) -> output
 test/
@@ -80,13 +80,13 @@ Per beat, a pulse = systolic Gaussian + smaller diastolic Gaussian (dicrotic not
 
 ### Artifact (`artifact.js`)
 ```
-dynZ     = z - mean(z)                         (fixed axis: device z)
+dynZ     = z - g_z                             (fixed axis: device z; g_z = gravityVector(pitch, roll)[2])
 smooth   = lowpassZeroPhase(dynZ, fc = 8 Hz)   (single-pole forward then backward;
                                                 non-negative kernel, unit DC gain)
 artifact = artifactGain * 2.0 * smooth
 ppg      = clamp(ppgClean + artifact, -3, 3)
 ```
-Because the kernel is non-negative and sums to 1, `|smooth| <= max|dynZ| <= 0.75`, so `|artifact| <= 1.5` and `|ppgClean + artifact| <= 3`. The clamp never changes valid output. With gain 0, `artifact` is all zeros (no floating-point residue) and `ppg` equals `ppgClean`. Using a fixed axis removes the sign ambiguity of a "dominant direction" and makes the correlation thresholds testable.
+Bound: the IMU output is `z = clamp(g_z + clamp(dyn, -0.75, 0.75), -4, 4)` and `|g_z| <= 1`, so the outer clamp never acts and `dynZ = z - g_z` equals the clamped dynamic part (up to floating-point rounding, about 1e-15). Hence `|dynZ| <= 0.75` (at most 0.71 by construction, R5.6). Because the low-pass kernel is non-negative and sums to 1, `|smooth| <= max|dynZ| <= 0.75`, so `|artifact| <= 1.5` and `|ppgClean + artifact| <= 1.05 + 1.5 = 2.55 < 3`. The clamp never changes valid output. Mean removal was rejected because a mean-removed signal can reach the full peak-to-peak range of the dynamic part (about 1.42 g), which would break this bound. With gain 0, `artifact` is all zeros (no floating-point residue) and `ppg` equals `ppgClean`. Using a fixed axis removes the sign ambiguity of a "dominant direction" and makes the correlation thresholds testable.
 
 ### Spectrum helper (`spectrum.js`)
 `bandEnergy(signal, fs, loHz, hiHz)`: remove the mean, apply a DFT or Goertzel sum over bins in [lo, hi], return total energy. `tremorBandEnergy(accel, fs)` sums it over x, y, z for 3-6 Hz.

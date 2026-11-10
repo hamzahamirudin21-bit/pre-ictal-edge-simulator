@@ -4,7 +4,8 @@
  * EDUCATIONAL SIMULATION ONLY. All data is synthetic. NOT a medical device.
  * Every constant below is an illustrative simulation value, not a clinical value.
  *
- *   dynZ     = z - mean(z)                      (fixed axis: device z)
+ *   dynZ     = z - g_z       (gravity subtraction on the fixed device z axis;
+ *                             g_z = gravityVector(pitch, roll)[2])
  *   smooth   = lowpassZeroPhase(dynZ, fs, 8 Hz)
  *   artifact = artifactGain * ARTIFACT_SCALE * smooth
  *   ppg      = clamp(ppgClean + artifact, -PPG_ARTIFACT_CLIP, PPG_ARTIFACT_CLIP)
@@ -12,6 +13,15 @@
  * The low-pass is a convex single-pole filter run forward then backward, so
  * its kernel is non-negative with unit DC gain (constant input is preserved
  * exactly). The artifact is a signed projection, not a magnitude.
+ *
+ * Bound: the IMU output is z = clamp(g_z + clamp(dyn, -0.75, 0.75), -4, 4)
+ * with |g_z| <= 1, so the outer clamp never acts and dynZ equals the clamped
+ * dynamic part (up to ~1e-15 rounding). Hence |dynZ| <= 0.75 (at most 0.71 by
+ * construction). The non-negative unit-sum kernel gives |smooth| <= 0.75, so
+ * |artifact| <= 1.5 and |ppgClean + artifact| <= 1.05 + 1.5 = 2.55 < 3; the
+ * final clamp is a safety net. Mean removal was rejected because a
+ * mean-removed signal can reach the full peak-to-peak range (~1.42 g), which
+ * would break this bound.
  */
 
 /** Artifact amplitude per unit of smoothed dynamic z, PPG units per g (illustrative). */
@@ -62,33 +72,46 @@ export function lowpassZeroPhase(signal, fs, fcHz = ARTIFACT_LOWPASS_HZ) {
   return out;
 }
 
+function checkGravityZ(gravityZ) {
+  if (typeof gravityZ !== 'number') throw new TypeError('gravityZ must be a number');
+  if (!Number.isFinite(gravityZ) || gravityZ < -1 || gravityZ > 1) {
+    throw new RangeError('gravityZ must be a finite number in [-1, 1]');
+  }
+}
+
 /**
- * Mean-removed z axis and its zero-phase low-pass (the artifact shape).
+ * Dynamic z (gravity subtracted) and its zero-phase low-pass (artifact shape).
+ * dynZ[i] = accelZ[i] - gravityZ; no mean removal.
  * @param {ArrayLike<number>} accelZ accelerometer z, g
+ * @param {number} gravityZ gravity component on z, g_z = gravityVector(pitch, roll)[2], in [-1, 1]
  * @param {number} fs sampling rate, Hz
  * @returns {{dynZ: Float64Array, smooth: Float64Array}}
+ * @throws {TypeError} if gravityZ is not a number
+ * @throws {RangeError} if gravityZ is non-finite or outside [-1, 1]
  */
-export function artifactComponents(accelZ, fs) {
+export function artifactComponents(accelZ, gravityZ, fs) {
+  checkGravityZ(gravityZ);
   const n = accelZ.length;
-  let sum = 0;
-  for (let i = 0; i < n; i++) sum += accelZ[i];
-  const mean = n > 0 ? sum / n : 0;
   const dynZ = new Float64Array(n);
-  for (let i = 0; i < n; i++) dynZ[i] = accelZ[i] - mean;
+  for (let i = 0; i < n; i++) dynZ[i] = accelZ[i] - gravityZ;
   return { dynZ, smooth: lowpassZeroPhase(dynZ, fs, ARTIFACT_LOWPASS_HZ) };
 }
 
 /**
- * Motion artifact: artifactGain * ARTIFACT_SCALE * lowpass(z - mean(z)).
+ * Motion artifact: artifactGain * ARTIFACT_SCALE * lowpass(z - g_z).
  * With artifactGain === 0 every sample is exactly +0.
  * @param {ArrayLike<number>} accelZ accelerometer z, g
+ * @param {number} gravityZ gravity component on z, in [-1, 1] (required)
  * @param {number} artifactGain in [0, 1]
  * @param {number} fs sampling rate, Hz
  * @returns {Float64Array}
+ * @throws {TypeError} if gravityZ is not a number
+ * @throws {RangeError} if gravityZ is non-finite or outside [-1, 1]
  */
-export function computeArtifact(accelZ, artifactGain, fs) {
+export function computeArtifact(accelZ, gravityZ, artifactGain, fs) {
+  checkGravityZ(gravityZ);
   if (artifactGain === 0) return new Float64Array(accelZ.length);
-  const { smooth } = artifactComponents(accelZ, fs);
+  const { smooth } = artifactComponents(accelZ, gravityZ, fs);
   const k = artifactGain * ARTIFACT_SCALE;
   const out = new Float64Array(smooth.length);
   for (let i = 0; i < smooth.length; i++) out[i] = k * smooth[i];

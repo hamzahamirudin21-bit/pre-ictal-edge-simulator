@@ -21,7 +21,8 @@ const ANGLES = [-180, -90, 0, 90, 180];
 const TIMEOUT = 30000;
 
 function imu(over = {}) {
-  return generateIMU(validateParams(over));
+  const out = generateIMU(validateParams(over));
+  return { ...out, gz: out.gravity[2] };
 }
 
 function ppgClean(seed, hr, durationSec, fs) {
@@ -122,8 +123,8 @@ describe('|smooth| <= max|dynZ| (R6.1)', () => {
   it.each(FSS)('imu z, fs %i', (fs) => {
     for (const seed of SEEDS) {
       for (const tremorIntensity of [0, 1]) {
-        const { z } = imu({ seed, durationSec: 10, fs, motionIntensity: 0.8, tremorIntensity });
-        const { dynZ, smooth } = artifactComponents(z, fs);
+        const { z, gz } = imu({ seed, durationSec: 10, fs, motionIntensity: 0.8, tremorIntensity });
+        const { dynZ, smooth } = artifactComponents(z, gz, fs);
         expect(maxAbs(smooth), `seed ${seed}`).toBeLessThanOrEqual(maxAbs(dynZ) + 1e-12);
       }
     }
@@ -133,9 +134,9 @@ describe('|smooth| <= max|dynZ| (R6.1)', () => {
 describe('gain 0 (R6.2)', () => {
   it.each(FSS)('artifact is all +0 and ppg equals ppgClean exactly (fs %i)', (fs) => {
     for (const seed of SEEDS) {
-      const { z } = imu({ seed, durationSec: 10, fs, motionIntensity: 1, tremorIntensity: 1 });
+      const { z, gz } = imu({ seed, durationSec: 10, fs, motionIntensity: 1, tremorIntensity: 1 });
       const zCopy = Float64Array.from(z);
-      const art = computeArtifact(z, 0, fs);
+      const art = computeArtifact(z, gz, 0, fs);
       expect(art).toBeInstanceOf(Float64Array);
       expect(art.length).toBe(z.length);
       for (const v of art) expect(Object.is(v, 0)).toBe(true);
@@ -175,12 +176,12 @@ describe('correlation (R6.3, P5)', () => {
       for (const seed of SEEDS) {
         for (const tremorIntensity of [0, 0.5, 1]) {
           for (const motionIntensity of [0.3, 0.6, 1]) {
-            const { z } = imu({ seed, durationSec, fs, motionIntensity, tremorIntensity });
-            const { dynZ, smooth } = artifactComponents(z, fs);
+            const { z, gz } = imu({ seed, durationSec, fs, motionIntensity, tremorIntensity });
+            const { dynZ, smooth } = artifactComponents(z, gz, fs);
             const ctx = `seed ${seed} fs ${fs} dur ${durationSec} motion ${motionIntensity} tremor ${tremorIntensity}`;
             expect(rms(dynZ), ctx).toBeGreaterThanOrEqual(0.01);
             for (const gain of [0.01, 0.5, 1]) {
-              const art = computeArtifact(z, gain, fs);
+              const art = computeArtifact(z, gz, gain, fs);
               const r1 = pearson(art, smooth);
               const r2 = pearson(art, z);
               record(minPearson, fs, r1);
@@ -197,11 +198,11 @@ describe('correlation (R6.3, P5)', () => {
   it('smooth correlation also holds at default motion 0.2 when RMS precondition is met', () => {
     for (const fs of FSS) {
       for (const seed of SEEDS) {
-        const { z } = imu({ seed, durationSec: 30, fs, motionIntensity: 0.2 });
-        const { dynZ, smooth } = artifactComponents(z, fs);
+        const { z, gz } = imu({ seed, durationSec: 30, fs, motionIntensity: 0.2 });
+        const { dynZ, smooth } = artifactComponents(z, gz, fs);
         if (rms(dynZ) < 0.01) continue;
         for (const gain of [0.01, 0.5, 1]) {
-          expect(pearson(computeArtifact(z, gain, fs), smooth), `seed ${seed} fs ${fs}`).toBeGreaterThanOrEqual(0.999);
+          expect(pearson(computeArtifact(z, gz, gain, fs), smooth), `seed ${seed} fs ${fs}`).toBeGreaterThanOrEqual(0.999);
         }
       }
     }
@@ -209,10 +210,11 @@ describe('correlation (R6.3, P5)', () => {
 });
 
 describe('bounds at extreme corners (R7.1, P8)', () => {
+  let maxDyn = 0;
   let maxArt = 0;
   let maxSum = 0;
   afterAll(() => {
-    console.log(`max |artifact| = ${maxArt}, max |ppgClean + artifact| = ${maxSum}`);
+    console.log(`max |dynZ| = ${maxDyn}, max |artifact| = ${maxArt}, max |ppgClean + artifact| = ${maxSum}`);
   });
 
   it.each([[5, 25], [5, 64], [5, 256], [30, 64]])('dur %i s, fs %i', (durationSec, fs) => {
@@ -220,20 +222,29 @@ describe('bounds at extreme corners (R7.1, P8)', () => {
       const cleans = [40, 180].map((hr) => ppgClean(seed, hr, durationSec, fs));
       for (const pitchDeg of ANGLES) {
         for (const rollDeg of ANGLES) {
-          const { z } = imu({
+          const { z, gz } = imu({
             seed, durationSec, fs, motionIntensity: 1, tremorIntensity: 1, artifactGain: 1,
             orientation: { pitchDeg, rollDeg },
           });
-          const art = computeArtifact(z, 1, fs);
+          const { dynZ } = artifactComponents(z, gz, fs);
+          const art = computeArtifact(z, gz, 1, fs);
           const ctx = `seed ${seed} p${pitchDeg} r${rollDeg}`;
+          expect(maxAbs(dynZ), ctx).toBeLessThanOrEqual(0.71 + 1e-12);
+          expect(maxAbs(art), ctx).toBeLessThanOrEqual(1.42 + 1e-12);
           expect(maxAbs(art), ctx).toBeLessThanOrEqual(1.5);
+          maxDyn = Math.max(maxDyn, maxAbs(dynZ));
           maxArt = Math.max(maxArt, maxAbs(art));
           for (const clean of cleans) {
+            const out = applyArtifact(clean, art);
             let m = 0;
-            for (let i = 0; i < clean.length; i++) m = Math.max(m, Math.abs(clean[i] + art[i]));
+            for (let i = 0; i < clean.length; i++) {
+              const sum = clean[i] + art[i];
+              m = Math.max(m, Math.abs(sum));
+              // clamp inactive: output is exactly the unclamped sum
+              if (out[i] !== sum) expect(out[i], `${ctx} i ${i}`).toBe(sum);
+            }
             expect(m, ctx).toBeLessThanOrEqual(3);
             maxSum = Math.max(maxSum, m);
-            expect(maxAbs(applyArtifact(clean, art)), ctx).toBeLessThanOrEqual(3);
           }
         }
       }
@@ -241,31 +252,79 @@ describe('bounds at extreme corners (R7.1, P8)', () => {
   }, TIMEOUT);
 });
 
-describe('constant z (RMS = 0)', () => {
-  it.each(FSS)('artifact and ppg are finite (all zero) at fs %i', (fs) => {
-    for (const c of [1, -1, 0, 0.3333333333333333]) {
-      const z = new Float64Array(10 * fs).fill(c);
+describe('constant z', () => {
+  const GZS = [1, -1, 0, 0.3333333333333333, -0.6];
+
+  it.each(FSS)('z equal to gravityZ gives an all-zero finite artifact at fs %i', (fs) => {
+    for (const gz of GZS) {
+      const z = new Float64Array(10 * fs).fill(gz);
       for (const gain of [0.01, 0.5, 1]) {
-        const art = computeArtifact(z, gain, fs);
+        const art = computeArtifact(z, gz, gain, fs);
         for (const v of art) {
           expect(Number.isFinite(v)).toBe(true);
           expect(Math.abs(v)).toBeLessThanOrEqual(1e-12);
         }
         const clean = ppgClean(3, 70, 10, fs);
-        const out = applyArtifact(clean, art);
-        for (const v of out) expect(Number.isFinite(v)).toBe(true);
+        for (const v of applyArtifact(clean, art)) expect(Number.isFinite(v)).toBe(true);
+      }
+    }
+  });
+
+  // Here RMS(dynZ) is NOT 0: dynZ is the constant c - gravityZ, and the unit-DC-gain
+  // low-pass preserves it, so the artifact is the constant gain * 2 * (c - gravityZ).
+  it.each(FSS)('z = gravityZ + offset gives a constant artifact at fs %i', (fs) => {
+    for (const gz of GZS) {
+      for (const offset of [0.3, -0.5]) {
+        const z = new Float64Array(10 * fs).fill(gz + offset);
+        for (const gain of [0.01, 0.5, 1]) {
+          const art = computeArtifact(z, gz, gain, fs);
+          const expected = gain * 2 * (z[0] - gz);
+          for (const v of art) {
+            expect(Number.isFinite(v)).toBe(true);
+            expect(Math.abs(v - expected)).toBeLessThanOrEqual(1e-12);
+          }
+          const clean = ppgClean(3, 70, 10, fs);
+          for (const v of applyArtifact(clean, art)) expect(Number.isFinite(v)).toBe(true);
+        }
       }
     }
   });
 });
 
+describe('gravityZ validation', () => {
+  const z = Float64Array.from([0.1, 0.2, 0.3, 0.2]);
+  const calls = [
+    (g) => computeArtifact(z, g, 0.5, 64),
+    (g) => artifactComponents(z, g, 64),
+  ];
+
+  it.each([['0.5'], [null], [undefined]])('throws TypeError for %s', (bad) => {
+    for (const f of calls) expect(() => f(bad)).toThrow(TypeError);
+  });
+
+  it.each([[NaN], [Infinity], [-Infinity], [1.0001], [-1.0001]])('throws RangeError for %s', (bad) => {
+    for (const f of calls) expect(() => f(bad)).toThrow(RangeError);
+  });
+
+  it.each([[-1], [0], [1]])('accepts %i', (g) => {
+    for (const f of calls) expect(() => f(g)).not.toThrow();
+  });
+
+  it('gain 0 returns all +0 for any valid gravityZ', () => {
+    for (const g of [-1, -0.4, 0, 0.7, 1]) {
+      const art = computeArtifact(z, g, 0, 64);
+      expect(art.length).toBe(z.length);
+      for (const v of art) expect(Object.is(v, 0)).toBe(true);
+    }
+  });
+});
 describe('format, errors, purity', () => {
   it('returns Float64Array of the same length and does not mutate input', () => {
-    const { z } = imu({ seed: 5, durationSec: 8, fs: 64, motionIntensity: 0.7 });
+    const { z, gz } = imu({ seed: 5, durationSec: 8, fs: 64, motionIntensity: 0.7 });
     const copy = Float64Array.from(z);
     const lp = lowpassZeroPhase(z, 64);
-    const { dynZ, smooth } = artifactComponents(z, 64);
-    const art = computeArtifact(z, 0.5, 64);
+    const { dynZ, smooth } = artifactComponents(z, gz, 64);
+    const art = computeArtifact(z, gz, 0.5, 64);
     for (const a of [lp, dynZ, smooth, art]) {
       expect(a).toBeInstanceOf(Float64Array);
       expect(a.length).toBe(z.length);
@@ -275,24 +334,24 @@ describe('format, errors, purity', () => {
   });
 
   it('is deterministic', () => {
-    const { z } = imu({ seed: 5, durationSec: 8, fs: 64, motionIntensity: 0.7 });
-    expect(computeArtifact(z, 0.5, 64)).toEqual(computeArtifact(z, 0.5, 64));
+    const { z, gz } = imu({ seed: 5, durationSec: 8, fs: 64, motionIntensity: 0.7 });
+    expect(computeArtifact(z, gz, 0.5, 64)).toEqual(computeArtifact(z, gz, 0.5, 64));
     expect(lowpassZeroPhase(z, 64)).toEqual(lowpassZeroPhase(z, 64));
   });
 
   it('artifact = gain * 2 * smooth', () => {
-    const { z } = imu({ seed: 6, durationSec: 8, fs: 64, motionIntensity: 0.7 });
-    const { smooth } = artifactComponents(z, 64);
-    const art = computeArtifact(z, 0.4, 64);
+    const { z, gz } = imu({ seed: 6, durationSec: 8, fs: 64, motionIntensity: 0.7 });
+    const { smooth } = artifactComponents(z, gz, 64);
+    const art = computeArtifact(z, gz, 0.4, 64);
     for (let i = 0; i < art.length; i++) expect(art[i]).toBeCloseTo(0.4 * 2 * smooth[i], 12);
   });
 
-  it('dynZ has zero mean', () => {
-    const { z } = imu({ seed: 6, durationSec: 8, fs: 64, motionIntensity: 0.7 });
-    const { dynZ } = artifactComponents(z, 64);
-    let s = 0;
-    for (const v of dynZ) s += v;
-    expect(Math.abs(s / dynZ.length)).toBeLessThanOrEqual(1e-12);
+  it('dynZ[i] === z[i] - gravityZ exactly, for several orientations', () => {
+    for (const [pitchDeg, rollDeg] of [[0, 0], [30, -20], [90, 45], [-180, 90], [10, 180]]) {
+      const { z, gz } = imu({ seed: 6, durationSec: 8, fs: 64, motionIntensity: 0.7, orientation: { pitchDeg, rollDeg } });
+      const { dynZ } = artifactComponents(z, gz, 64);
+      expect(dynZ).toEqual(Float64Array.from(z, (v) => v - gz));
+    }
   });
 
   it('applyArtifact throws RangeError on length mismatch and does not mutate inputs', () => {
@@ -319,9 +378,9 @@ describe('format, errors, purity', () => {
     const e = lowpassZeroPhase(new Float64Array(0), 64);
     expect(e).toBeInstanceOf(Float64Array);
     expect(e.length).toBe(0);
-    expect(computeArtifact(new Float64Array(0), 0.5, 64).length).toBe(0);
+    expect(computeArtifact(new Float64Array(0), 0, 0.5, 64).length).toBe(0);
     expect(applyArtifact(new Float64Array(0), new Float64Array(0)).length).toBe(0);
-    const c = artifactComponents(new Float64Array(0), 64);
+    const c = artifactComponents(new Float64Array(0), 0, 64);
     expect(c.dynZ.length).toBe(0);
     expect(c.smooth.length).toBe(0);
   });

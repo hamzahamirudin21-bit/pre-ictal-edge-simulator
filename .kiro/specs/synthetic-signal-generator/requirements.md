@@ -77,7 +77,7 @@ The minimum `fs` of 25 Hz keeps the 3-6 Hz tremor band safely below Nyquist. The
 6. The dynamic (non-gravity) part of each axis SHALL be bounded by 0.75 g by construction; clamping is a safety net only.
 
 ### R6: Motion artifact in PPG
-1. The artifact SHALL be defined as `artifact = artifactGain * 2.0 * lowpass(dynZ)`, where `dynZ` is the mean-removed accel z-axis (a **fixed axis**, device z), and `lowpass` is a zero-phase single-pole low-pass at 8 Hz with non-negative kernel and unit DC gain. The artifact is a signed projection, not a magnitude.
+1. The artifact SHALL be defined as `artifact = artifactGain * 2.0 * lowpass(dynZ)`, where `dynZ = accel.z - g_z` is the accel z-axis (a **fixed axis**, device z) minus the gravity component on z given by the orientation (gravity subtraction, not mean removal), and `lowpass` is a zero-phase single-pole low-pass at 8 Hz with non-negative kernel and unit DC gain. The artifact is a signed projection, not a magnitude.
 2. `ppg = clamp(ppgClean + artifact, -3, 3)`. With `artifactGain = 0`, `artifact` SHALL be all zeros and `ppg` SHALL equal `ppgClean` exactly.
 3. **Correlation thresholds.** When `artifactGain >= 0.01` and the RMS of `dynZ` is at least 0.01 g:
    - Pearson correlation between `artifact` and `lowpass(dynZ)` SHALL be at least 0.999;

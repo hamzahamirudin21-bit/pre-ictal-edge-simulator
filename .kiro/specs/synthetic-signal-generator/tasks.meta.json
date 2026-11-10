@@ -97,6 +97,16 @@
         "executionId": "b57bebb8-06ff-4ff4-8fdb-439198964e59",
         "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
         "timestamp": 1794287211285
+      },
+      {
+        "executionId": "1d884fe2-7952-4c7c-88b9-a8af71ec5a8e",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794290243028
+      },
+      {
+        "executionId": "1d884fe2-7952-4c7c-88b9-a8af71ec5a8e",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794290429610
       }
     ],
     "6.2 Unit tests: low-pass has unit DC gain and non-negative kernel, gain 0 gives zeros and `ppg` equals `ppgClean`, correlation thresholds (0.999 and 0.9), bounds": [
@@ -109,6 +119,16 @@
         "executionId": "b57bebb8-06ff-4ff4-8fdb-439198964e59",
         "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
         "timestamp": 1794287852153
+      },
+      {
+        "executionId": "1d884fe2-7952-4c7c-88b9-a8af71ec5a8e",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794290431062
+      },
+      {
+        "executionId": "1d884fe2-7952-4c7c-88b9-a8af71ec5a8e",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794290628518
       }
     ],
     "6. Motion artifact": [
