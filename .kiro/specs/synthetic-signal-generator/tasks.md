@@ -1,8 +1,12 @@
-# Tasks: Module 1 - Synthetic Signal Generator
+# Implementation Plan: Module 1 - Synthetic Signal Generator
 
 > EDUCATIONAL SIMULATION ONLY. All data is synthetic. This is NOT a medical device and makes no clinical claims.
 
-Parameter ranges and defaults: see the table in `requirements.md`.
+## Overview
+
+This plan builds the synthetic signal generator in small steps: seeded PRNG and parameters, then HRV and PPG, IMU, and motion artifact, followed by assembly, property-based tests, docs, and a demo page.
+
+## Tasks
 
 - [x] 1. Add the disclaimer to README.md and create the steering doc (`.kiro/steering/disclaimer-and-safety.md`) _(R8)_
 
@@ -12,10 +16,10 @@ Parameter ranges and defaults: see the table in `requirements.md`.
   - [x] 2.3 Add a placeholder test (for example `test/disclaimer.test.js` checking that `DISCLAIMER_TEXT` mentions "synthetic" and "NOT a medical device") so the test runner does not fail with no test files
   - [x] 2.4 Verify that `npm run build` and `npm test` pass
 
-- [ ] 3. Seeded PRNG and params
-  - [ ] 3.1 Implement `src/generator/prng.js` (mulberry32, gaussian, `deriveSeed`) _(R1.1, R1.5)_
-  - [ ] 3.2 Implement `src/generator/params.js` (DEFAULTS, validateParams, including seed, `fs`, and duration ranges from the table) _(R1.6, R2.5)_
-  - [ ] 3.3 Unit tests: repeatability, range [0,1), different seeds differ, `deriveSeed` stability and label independence, validation errors (type and range, including seed and non-integer `fs`), defaults _(R1, R2, R9.1)_
+- [x] 3. Seeded PRNG and params
+  - [x] 3.1 Implement `src/generator/prng.js` (mulberry32, gaussian, `deriveSeed`) _(R1.1, R1.5)_
+  - [x] 3.2 Implement `src/generator/params.js` (DEFAULTS, validateParams, including seed, `fs`, and duration ranges from the table) _(R1.6, R2.5)_
+  - [x] 3.3 Unit tests: repeatability, range [0,1), different seeds differ, `deriveSeed` stability and label independence, validation errors (type and range, including seed and non-integer `fs`), defaults _(R1, R2, R9.1)_
 
 - [ ] 4. HRV and PPG
   - [ ] 4.1 Implement `hrv.js`: `resolveHrv` (shift + feasibility clamp, `clamped` flags) and `generateRRSeries` _(R3, R4)_
@@ -54,3 +58,32 @@ Parameter ranges and defaults: see the table in `requirements.md`.
   - [ ] 10.2 Manually check that the disclaimer is visible without interaction and that no copy implies clinical meaning
 
 - [ ] 11. Final checkpoint: run `npm test` and `npm run build`; confirm the README, the module docs, and every screen show the disclaimer
+
+## Notes
+
+- Parameter ranges and defaults: see the table in `requirements.md`.
+- All data is synthetic. This is NOT a medical device and makes no clinical claims.
+- Dependencies between top-level tasks: 2 after 1; 3 after 2; 4 and 5 after 3; 6 after 4 and 5; 7 after 4, 5, 6; 8 and 9 after 7; 10 after 7 and 9; 11 after 8, 9, 10.
+
+## Task Dependency Graph
+
+```json
+{
+  "waves": [
+    { "id": 0, "tasks": ["3.1", "3.2"] },
+    { "id": 1, "tasks": ["3.3", "4.1", "5.1", "5.2"] },
+    { "id": 2, "tasks": ["4.2", "5.3"] },
+    { "id": 3, "tasks": ["4.3", "6.1"] },
+    { "id": 4, "tasks": ["6.2", "7.1"] },
+    { "id": 5, "tasks": ["7.2", "8.1", "9.1"] },
+    { "id": 6, "tasks": ["8.2", "10.1"] },
+    { "id": 7, "tasks": ["8.3", "10.2"] },
+    { "id": 8, "tasks": ["8.4"] },
+    { "id": 9, "tasks": ["8.5"] },
+    { "id": 10, "tasks": ["8.6"] },
+    { "id": 11, "tasks": ["8.7"] },
+    { "id": 12, "tasks": ["8.8"] },
+    { "id": 13, "tasks": ["8.9"] }
+  ]
+}
+```
