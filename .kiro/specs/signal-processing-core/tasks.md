@@ -8,16 +8,16 @@ This plan builds Module 2 in small steps: biquad design and the PPG bandpass, th
 
 ## Tasks
 
-- [ ] 1. Biquad design and PPG bandpass
-  - [ ] 1.1 Implement `src/dsp/biquad.js` and `src/dsp/butterworth.js`
+- [x] 1. Biquad design and PPG bandpass
+  - [x] 1.1 Implement `src/dsp/biquad.js` and `src/dsp/butterworth.js`
     - `designLowpass` / `designHighpass`: 2nd-order Butterworth, Q = 1/sqrt(2), bilinear transform with prewarping `K = tan(pi * fc / fs)`, RBJ form, `a0 = 1`; `RangeError` naming `fc` and `fs` for invalid cutoffs
     - `filterBiquad`: transposed Direct Form II, double precision, causal single pass, optional steady-state initialization from `x[0]`; returns a new `Float64Array`
     - Helpers: `dcGain`, `magnitudeAt`, `poleRadius`, impulse-response `l1Norm` (tail below 1e-12 for 1 s)
     - _Requirements: 4.1, 4.2, 4.3, 4.6_
-  - [ ] 1.2 Implement `src/dsp/bandpass.js`
+  - [x] 1.2 Implement `src/dsp/bandpass.js`
     - Cascade of the 0.5 Hz high-pass then the 4 Hz low-pass, steady-state initialization, `bandpassPpg(x, fs)`, `bandpassDesign(fs)` returning `{sections, groupDelaySecAt1Hz, l1}`
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.6_
-  - [ ] 1.3 Write unit tests in `test/dsp.biquad.test.js` and `test/dsp.bandpass.test.js`
+  - [x] 1.3 Write unit tests in `test/dsp.biquad.test.js` and `test/dsp.bandpass.test.js`
     - Coefficients against closed-form values for several `fs`; DC gain 0 (high-pass) and 1 (low-pass); -3 dB at `fc`; pole radius below 1 for every integer `fs` from 25 to 256; steady-state initialization; cascade order and 4 poles / 4 zeros; group delay reported; L1 bound on example inputs; invalid cutoff errors
     - _Requirements: 4.1, 4.2, 4.4, 4.5, 4.6, 5.1, 5.2, 5.3, 5.4, 16.1_
 
