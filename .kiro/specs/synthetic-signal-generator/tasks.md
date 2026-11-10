@@ -31,9 +31,9 @@ This plan builds the synthetic signal generator in small steps: seeded PRNG and 
   - [x] 5.2 Implement `spectrum.js` (`bandEnergy`, `tremorBandEnergy`)
   - [x] 5.3 Unit tests: gravity magnitude near 1 g at rest, no tremor at 0, at least one burst, bursts do not overlap, burst frequencies inside 3-6 Hz, dominant spectral peak inside 3-6 Hz, tremor difference signal scales as `t^2`, bounds
 
-- [ ] 6. Motion artifact
-  - [ ] 6.1 Implement `artifact.js` (`lowpassZeroPhase`, `computeArtifact` on fixed z axis, scale 2.0) and integrate into the PPG _(R6)_
-  - [ ] 6.2 Unit tests: low-pass has unit DC gain and non-negative kernel, gain 0 gives zeros and `ppg` equals `ppgClean`, correlation thresholds (0.999 and 0.9), bounds
+- [x] 6. Motion artifact
+  - [x] 6.1 Implement `artifact.js` (`lowpassZeroPhase`, `computeArtifact` on fixed z axis, scale 2.0) and integrate into the PPG _(R6)_
+  - [x] 6.2 Unit tests: low-pass has unit DC gain and non-negative kernel, gain 0 gives zeros and `ppg` equals `ppgClean`, correlation thresholds (0.999 and 0.9), bounds
 
 - [ ] 7. Assemble `generateSignals` in `src/generator/index.js`
   - [ ] 7.1 Independent RNG sub-streams via `deriveSeed`, output shape, `synthetic: true`, `meta` (effective values, `clamped`, `tremorBursts`) _(R1, R2, R8)_

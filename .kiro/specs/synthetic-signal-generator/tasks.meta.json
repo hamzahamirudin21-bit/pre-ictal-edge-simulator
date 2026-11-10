@@ -86,6 +86,37 @@
         "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
         "timestamp": 1794285327368
       }
+    ],
+    "6.1 Implement `artifact.js` (`lowpassZeroPhase`, `computeArtifact` on fixed z axis, scale 2.0) and integrate into the PPG _(R6)_": [
+      {
+        "executionId": "b57bebb8-06ff-4ff4-8fdb-439198964e59",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794286979958
+      },
+      {
+        "executionId": "b57bebb8-06ff-4ff4-8fdb-439198964e59",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794287211285
+      }
+    ],
+    "6.2 Unit tests: low-pass has unit DC gain and non-negative kernel, gain 0 gives zeros and `ppg` equals `ppgClean`, correlation thresholds (0.999 and 0.9), bounds": [
+      {
+        "executionId": "b57bebb8-06ff-4ff4-8fdb-439198964e59",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794287211963
+      },
+      {
+        "executionId": "b57bebb8-06ff-4ff4-8fdb-439198964e59",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794287852153
+      }
+    ],
+    "6. Motion artifact": [
+      {
+        "executionId": "b57bebb8-06ff-4ff4-8fdb-439198964e59",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794287852575
+      }
     ]
   }
 }

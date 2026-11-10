@@ -92,12 +92,12 @@ Because the kernel is non-negative and sums to 1, `|smooth| <= max|dynZ| <= 0.75
 `bandEnergy(signal, fs, loHz, hiHz)`: remove the mean, apply a DFT or Goertzel sum over bins in [lo, hi], return total energy. `tremorBandEnergy(accel, fs)` sums it over x, y, z for 3-6 Hz.
 
 ## Correctness properties (fast-check)
-Parameter arbitraries draw from the table in `requirements.md`.
+Parameter arbitraries draw from the table in `requirements.md`. Exception (R9.4): P4 calls `tremorBandEnergy`, and `bandEnergy` is O(N x bins), so P4 draws `durationSec <= 30` and `fs <= 64` and uses `numRuns <= 30`. All other properties draw from the full table ranges. Property tests set an explicit timeout via the test options (for example `it(name, fn, 30000)` or `{ timeout: 30000 }`).
 
 1. **P1 Determinism:** equal params and seed give deeply equal output (`Float64Array` equality).
 2. **P2 Length:** `ppg`, `ppgClean`, `artifact`, `accel.x/y/z` all have length `round(duration * fs)`.
 3. **P3 Bounds:** `ppgClean` in [-1.5, 1.5], `ppg` in [-3, 3], `artifact` in [-1.5, 1.5], accel in [-4, 4], all finite, all arrays are `Float64Array`.
-4. **P4 Tremor energy:** for fixed seed and other params, let `D(t) = accel(t) - accel(0)` and `E = tremorBandEnergy`. For `t1 < t2` with `t1, t2 ∈ {0} ∪ [0.05, 1]`: `E(D(t2)) > E(D(t1))`, and for every such t: `|E(D(t)) − t^2 · E(D(1))| <= 1e-6 · E(D(1))`. Also `E(accel(1)) > E(accel(0))`.
+4. **P4 Tremor energy:** for fixed seed and other params, let `D(t) = accel(t) - accel(0)` and `E = tremorBandEnergy`. For `t1 < t2` with `t1, t2 ∈ {0} ∪ [0.05, 1]`: `E(D(t2)) > E(D(t1))`, and for every such t: `|E(D(t)) − t^2 · E(D(1))| <= 1e-6 · E(D(1))`. Also `E(accel(1)) > E(accel(0))`. Arbitraries for P4 are restricted as stated above (R9.4 exception).
 5. **P5 Artifact at gain 0:** `artifact` all zeros and `ppg` equals `ppgClean`.
 6. **P6 Beat times:** strictly increasing.
 7. **P7 Pre-ictal monotonic:** for `k1 <= k2` (`preIctalLikeness`), `meta.effectiveSdnnMs` (after the R3.4 cap) is non-increasing, and `meta.effectiveHrBpm` and `meta.lfhf` are non-decreasing; clamp flags are consistent with R3.4.

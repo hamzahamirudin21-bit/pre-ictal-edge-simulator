@@ -98,4 +98,5 @@ The minimum `fs` of 25 Hz keeps the 3-6 Hz tremor band safely below Nyquist. The
 1. Unit tests SHALL cover the PRNG, `deriveSeed`, parameter validation (including seed), each signal component, the feasibility clamp, and defaults.
 2. Property-based tests (fast-check) SHALL cover: same seed gives same output; sample count equals duration x rate; amplitudes bounded; tremor energy rises with the tremor parameter (R5.4).
 3. Additional properties: finite samples; artifact zero when gain is 0; strictly increasing beat times; pre-ictal knob monotonicity (SDNN, HR, LF/HF); artifact correlation thresholds (R6.3); arrays are `Float64Array`.
-4. Generators for property tests SHALL draw parameters from the table ranges in this document.
+4. Generators for property tests SHALL draw parameters from the table ranges in this document, with one explicit exception: because `bandEnergy` costs O(N x bins), the P4 tremor-energy property (R5.4), which calls `tremorBandEnergy`, SHALL draw `durationSec <= 30` and `fs <= 64` (still within the table ranges) and use `numRuns <= 30`. All other properties keep drawing from the full table ranges.
+5. Property tests SHALL set an explicit timeout through the test options (for example 30000 ms).
