@@ -58,11 +58,11 @@ The minimum `fs` of 25 Hz keeps the 3-6 Hz tremor band safely below Nyquist. The
    The cap guarantees that RR intervals stay within [300, 2000] ms, so the RR clamp is only a safety net that SHALL NOT alter the series for valid inputs.
 5. `meta` SHALL report `effectiveHrBpm`, `effectiveSdnnMs`, `lfhf`, and `clamped: {hr: boolean, sdnn: boolean}`. WHEN a clamp applies THEN the corresponding flag SHALL be true.
 6. The clamp rule SHALL be documented in the module docs and the parameter descriptions.
-7. Measured SDNN of the generated RR series SHALL be within 15% of `effectiveSdnnMs` (or within 3 ms when it is below 20 ms) for durations of at least 30 s.
+7. Measured SDNN, defined as the population standard deviation (divide by N) of the generated RR series `rrMs`, SHALL be within 15% of `effectiveSdnnMs` (or within 3 ms when it is below 20 ms) for durations of at least 30 s.
 
 ### R4: Pre-ictal-like HRV knob
 1. `preIctalLikeness` in [0, 1] SHALL shift the HRV profile toward a pre-ictal-like pattern: reduced overall HRV (`x(1 - 0.5k)`), a higher LF/HF ratio (`1 + 3k`), and a small increase in mean heart rate (`x(1 + 0.1k)`, before the R3.4 clamp).
-2. At 0 the output SHALL equal that of the unshifted configuration. `effectiveSdnnMs` (before the cap) SHALL be non-increasing, `effectiveHrBpm` non-decreasing, and `lfhf` non-decreasing in the knob.
+2. At 0 the output SHALL equal that of the unshifted configuration. With respect to `preIctalLikeness`, `meta.effectiveSdnnMs` (the value after the R3.4 cap) SHALL be non-increasing, and `meta.effectiveHrBpm` and `meta.lfhf` SHALL be non-decreasing.
 3. Docs, parameter descriptions, and UI labels SHALL state that this is a simulation knob and not a clinical claim.
 4. Constants SHALL be named and documented as illustrative simulation values.
 
@@ -79,7 +79,7 @@ The minimum `fs` of 25 Hz keeps the 3-6 Hz tremor band safely below Nyquist. The
 ### R6: Motion artifact in PPG
 1. The artifact SHALL be defined as `artifact = artifactGain * 2.0 * lowpass(dynZ)`, where `dynZ` is the mean-removed accel z-axis (a **fixed axis**, device z), and `lowpass` is a zero-phase single-pole low-pass at 8 Hz with non-negative kernel and unit DC gain. The artifact is a signed projection, not a magnitude.
 2. `ppg = clamp(ppgClean + artifact, -3, 3)`. With `artifactGain = 0`, `artifact` SHALL be all zeros and `ppg` SHALL equal `ppgClean` exactly.
-3. **Correlation thresholds.** When `artifactGain > 0` and the RMS of `dynZ` is at least 0.01 g:
+3. **Correlation thresholds.** When `artifactGain >= 0.01` and the RMS of `dynZ` is at least 0.01 g:
    - Pearson correlation between `artifact` and `lowpass(dynZ)` SHALL be at least 0.999;
    - Pearson correlation between `artifact` and raw `accel.z` SHALL be at least 0.9 when `motionIntensity >= 0.3`.
 4. `ppgClean`, `artifact`, and `ppg` SHALL all be exposed.

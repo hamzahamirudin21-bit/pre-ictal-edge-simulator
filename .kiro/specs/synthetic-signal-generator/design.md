@@ -60,9 +60,13 @@ shiftedSd = sdnn * (1 - 0.5k)
 effSdnn   = min(shiftedSd, sdnnCap)            clamped.sdnn = (shiftedSd > sdnnCap)
 lfhf      = 1 + 3k
 ```
-Rationale for the cap: LF and HF sinusoids with total SD `s` have a peak of at most `2s`; factor 2.5 leaves margin for beat-to-beat jitter, so RR stays within [300, 2000] ms and the final RR clamp never alters valid series. The constants (0.1, 0.5, 3) are named, illustrative simulation values.
+Variability is an LF sinusoid (~0.1 Hz) plus an HF sinusoid (~0.25 Hz) with random phases, power split per `lfhf` (LF power / HF power = lfhf), evaluated at beat time, with a combined (total) SD of `effSdnn * sqrt(0.96)`; plus Gaussian beat-to-beat jitter with sigma_j where sigma_j^2 = 0.04 * effSdnn^2 (sigma_j = 0.2 * effSdnn), clipped at +-2.5 * sigma_j.
 
-`generateRRSeries`: mean RR `meanRr` ms; variability is an LF sinusoid (~0.1 Hz) plus an HF sinusoid (~0.25 Hz) with random phases, power split per `lfhf`, plus small jitter, scaled so total SD equals `effSdnn`. The RR clamp [300, 2000] is a safety net. Cumulative sum gives beat times until `durationSec` plus one beat. For SDNN accuracy (R3.7) the sinusoid amplitudes are fixed from `effSdnn` and the sample SD is measured over whole beats.
+Amplitudes are computed analytically from `effSdnn` (each sinusoid amplitude a_i = sqrt(2 * P_i)); there is no division by a measured SD. When `effSdnn = 0`, all variability terms are exactly 0 and every RR equals meanRr.
+
+Bound: sinusoid peak <= 2 * sqrt(0.96) * effSdnn (about 1.96 effSdnn) plus jitter peak <= 0.5 * effSdnn, so the peak deviation is below 2.5 * effSdnn. Combined with sdnnCap, RR stays within [300, 2000] ms; the RR clamp is a safety net that never alters valid series.
+
+In `generateRRSeries`, the constants (0.1, 0.5, 3) are named, illustrative simulation values; cumulative sum gives beat times until `durationSec` plus one beat; expected total SD is about effSdnn (0.96 + 0.04 * clipped-Gaussian variance factor), satisfying R3.7.
 
 ### PPG (`ppg.js`)
 Per beat, a pulse = systolic Gaussian + smaller diastolic Gaussian (dicrotic notch), with small beat-to-beat width variation. Sum over beats, normalize so peak is about 1, add respiratory baseline wander (~0.25 Hz, amplitude 0.05), then clip to [-1.5, 1.5].
@@ -93,15 +97,15 @@ Parameter arbitraries draw from the table in `requirements.md`.
 1. **P1 Determinism:** equal params and seed give deeply equal output (`Float64Array` equality).
 2. **P2 Length:** `ppg`, `ppgClean`, `artifact`, `accel.x/y/z` all have length `round(duration * fs)`.
 3. **P3 Bounds:** `ppgClean` in [-1.5, 1.5], `ppg` in [-3, 3], `artifact` in [-1.5, 1.5], accel in [-4, 4], all finite, all arrays are `Float64Array`.
-4. **P4 Tremor energy:** for fixed seed and other params, take `t1 < t2` with `t2 - t1 >= 0.1`, and let `D(t) = accel(t) - accel(0)`. Then `tremorBandEnergy(D(t2)) > tremorBandEnergy(D(t1))`, and `energy(D(t)) ~ t^2 * energy(D(1))` within 1e-6 relative error. Also `tremorBandEnergy(accel(1)) > tremorBandEnergy(accel(0))`.
+4. **P4 Tremor energy:** for fixed seed and other params, let `D(t) = accel(t) - accel(0)` and `E = tremorBandEnergy`. For `t1 < t2` with `t1, t2 ∈ {0} ∪ [0.05, 1]`: `E(D(t2)) > E(D(t1))`, and for every such t: `|E(D(t)) − t^2 · E(D(1))| <= 1e-6 · E(D(1))`. Also `E(accel(1)) > E(accel(0))`.
 5. **P5 Artifact at gain 0:** `artifact` all zeros and `ppg` equals `ppgClean`.
 6. **P6 Beat times:** strictly increasing.
-7. **P7 Pre-ictal monotonic:** for `k1 <= k2`, `effectiveSdnnMs` (pre-cap shifted value) non-increasing, `effectiveHrBpm` non-decreasing, `lfhf` non-decreasing; clamp flags are consistent with R3.4.
-8. **P8 Artifact correlation:** when gain > 0 and RMS(dynZ) >= 0.01 g, Pearson(`artifact`, `lowpass(dynZ)`) >= 0.999; with `motionIntensity >= 0.3`, Pearson(`artifact`, `accel.z`) >= 0.9.
+7. **P7 Pre-ictal monotonic:** for `k1 <= k2` (`preIctalLikeness`), `meta.effectiveSdnnMs` (after the R3.4 cap) is non-increasing, and `meta.effectiveHrBpm` and `meta.lfhf` are non-decreasing; clamp flags are consistent with R3.4.
+8. **P8 Artifact correlation:** when `artifactGain >= 0.01` and RMS(dynZ) >= 0.01 g, Pearson(`artifact`, `lowpass(dynZ)`) >= 0.999; with `motionIntensity >= 0.3`, Pearson(`artifact`, `accel.z`) >= 0.9.
 9. **P9 Feasibility:** RR intervals (differences of `beatTimes`) lie in [0.3, 2.0] s for all valid inputs, and `effectiveHrBpm <= 180`.
 10. **P10 Input immutability:** the params object is not mutated.
 
-Unit tests also check sample SDNN against `effectiveSdnnMs` (R3.7) for durations of at least 30 s.
+Unit tests also check the measured SDNN (population SD, divide by N, of `rrMs`) against `effectiveSdnnMs` (R3.7) for durations of at least 30 s.
 
 ## Error handling
 `validateParams` throws `TypeError` for non-numeric and `RangeError` for out-of-range or non-finite inputs (including non-integer `seed` and `fs`), with messages naming the field and valid range.

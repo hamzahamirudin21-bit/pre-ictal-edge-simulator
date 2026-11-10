@@ -1,0 +1,48 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "4.1 Implement `hrv.js`: `resolveHrv` (shift + feasibility clamp, `clamped` flags) and `generateRRSeries` _(R3, R4)_": [
+      {
+        "executionId": "b9c4d5d3-960b-4f84-b843-9d0e92d84723",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794283709325
+      },
+      {
+        "executionId": "b9c4d5d3-960b-4f84-b843-9d0e92d84723",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794283906541
+      }
+    ],
+    "4.2 Implement `ppg.js` (pulse rendering, baseline wander, clip; `Float64Array` output) _(R3, R7)_": [
+      {
+        "executionId": "b9c4d5d3-960b-4f84-b843-9d0e92d84723",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794283907141
+      },
+      {
+        "executionId": "b9c4d5d3-960b-4f84-b843-9d0e92d84723",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794284007059
+      }
+    ],
+    "4.3 Unit tests: effective HR and SDNN formulas, clamp at 180 bpm and at the SDNN cap with flags, RR within [300, 2000] ms, sample SDNN within tolerance (R3.7) for 30 s or more, strictly increasing beat times, knob identity at 0, SDNN decreases and LF/HF increases with the knob, bounded PPG _(R9.1)_": [
+      {
+        "executionId": "b9c4d5d3-960b-4f84-b843-9d0e92d84723",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794284026906
+      },
+      {
+        "executionId": "b9c4d5d3-960b-4f84-b843-9d0e92d84723",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794284239899
+      }
+    ],
+    "4. HRV and PPG": [
+      {
+        "executionId": "b9c4d5d3-960b-4f84-b843-9d0e92d84723",
+        "chatSessionId": "sess_04da4565-ab22-450d-9034-3d0a9e26cffd",
+        "timestamp": 1794284240286
+      }
+    ]
+  }
+}

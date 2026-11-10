@@ -21,10 +21,10 @@ This plan builds the synthetic signal generator in small steps: seeded PRNG and 
   - [x] 3.2 Implement `src/generator/params.js` (DEFAULTS, validateParams, including seed, `fs`, and duration ranges from the table) _(R1.6, R2.5)_
   - [x] 3.3 Unit tests: repeatability, range [0,1), different seeds differ, `deriveSeed` stability and label independence, validation errors (type and range, including seed and non-integer `fs`), defaults _(R1, R2, R9.1)_
 
-- [ ] 4. HRV and PPG
-  - [ ] 4.1 Implement `hrv.js`: `resolveHrv` (shift + feasibility clamp, `clamped` flags) and `generateRRSeries` _(R3, R4)_
-  - [ ] 4.2 Implement `ppg.js` (pulse rendering, baseline wander, clip; `Float64Array` output) _(R3, R7)_
-  - [ ] 4.3 Unit tests: effective HR and SDNN formulas, clamp at 180 bpm and at the SDNN cap with flags, RR within [300, 2000] ms, sample SDNN within tolerance (R3.7) for 30 s or more, strictly increasing beat times, knob identity at 0, SDNN decreases and LF/HF increases with the knob, bounded PPG _(R9.1)_
+- [x] 4. HRV and PPG
+  - [x] 4.1 Implement `hrv.js`: `resolveHrv` (shift + feasibility clamp, `clamped` flags) and `generateRRSeries` _(R3, R4)_
+  - [x] 4.2 Implement `ppg.js` (pulse rendering, baseline wander, clip; `Float64Array` output) _(R3, R7)_
+  - [x] 4.3 Unit tests: effective HR and SDNN formulas, clamp at 180 bpm and at the SDNN cap with flags, RR within [300, 2000] ms, sample SDNN within tolerance (R3.7) for 30 s or more, strictly increasing beat times, knob identity at 0, SDNN decreases and LF/HF increases with the knob, bounded PPG _(R9.1)_
 
 - [ ] 5. IMU
   - [ ] 5.1 Implement `imu.js` (gravity and orientation, motion, noise, non-overlapping tremor bursts 3-6 Hz, dynamic bound) _(R5)_
@@ -43,7 +43,7 @@ This plan builds the synthetic signal generator in small steps: seeded PRNG and 
   - [ ] 8.1 P1 same seed gives same output
   - [ ] 8.2 P2 sample count equals duration x rate
   - [ ] 8.3 P3 amplitudes bounded, finite, `Float64Array`
-  - [ ] 8.4 P4 tremor energy rises with the tremor parameter (difference signal, gap of at least 0.1, `t^2` scaling, full signal at 1 above 0)
+  - [ ] 8.4 P4 tremor energy rises with the tremor parameter (difference signal, t1, t2 in {0} ∪ [0.05, 1], `t^2` scaling, full signal at 1 above 0)
   - [ ] 8.5 P5 artifact zero at gain 0 and `ppg` equals `ppgClean`
   - [ ] 8.6 P6 strictly increasing beat times
   - [ ] 8.7 P7 pre-ictal knob monotonic (SDNN, HR, LF/HF)
